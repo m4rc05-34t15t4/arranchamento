@@ -1,0 +1,67 @@
+CREATE TABLE om (
+    id_om SERIAL PRIMARY KEY,
+    nome_om VARCHAR(150) NOT NULL,
+    sigla_om VARCHAR(20)
+);
+
+
+
+CREATE TABLE patentes (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(30) UNIQUE NOT NULL,
+    ordem INTEGER NOT NULL
+);
+
+
+
+CREATE TABLE usuarios (
+    id SERIAL PRIMARY KEY,
+
+    -- Dados pessoais / militares
+    nome_guerra VARCHAR(50) NOT NULL,
+    nome_completo VARCHAR(150) NOT NULL,
+    idt_mil VARCHAR(30) UNIQUE NOT NULL,
+    cpf CHAR(11) UNIQUE NOT NULL,
+
+    -- Contato / acesso
+    email VARCHAR(150) UNIQUE NOT NULL,
+    senha VARCHAR(255) NOT NULL,
+
+    -- Relacionamentos
+    id_om INTEGER NOT NULL,
+    id_patente INTEGER NOT NULL,
+
+    -- Arranchamento
+    padrao_semanal JSONB,
+    excecao_semanal JSONB,
+    excecao_diaria JSONB,
+
+    ativo BOOLEAN DEFAULT TRUE,
+
+    CONSTRAINT fk_usuario_om
+        FOREIGN KEY (id_om)
+        REFERENCES om (id_om)
+        ON DELETE RESTRICT,
+
+    CONSTRAINT fk_usuario_patente
+        FOREIGN KEY (id_patente)
+        REFERENCES patentes (id)
+        ON DELETE RESTRICT
+);
+
+
+INSERT INTO patentes (nome, ordem) VALUES
+('SD EV', 1),
+('SD EP', 2),
+('CB', 3),
+('3º SGT', 4),
+('2º SGT', 5),
+('1º SGT', 6),
+('ST', 7),
+('ASP', 8),
+('2º TEN', 9),
+('1º TEN', 10),
+('CAP', 11),
+('MAJ', 12),
+('TEN-CEL', 13),
+('CEL', 14);
