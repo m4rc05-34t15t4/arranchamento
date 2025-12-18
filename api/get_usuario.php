@@ -37,7 +37,8 @@ SELECT
     u.excecao_semanal,
     u.excecao_diaria,
     p.nome AS patente,
-    o.nome_om
+    o.nome_om,
+    o.sigla_om
 FROM usuarios u
 JOIN patentes p ON p.id = u.id_patente
 JOIN om o ON o.id_om = u.id_om
@@ -61,6 +62,7 @@ echo json_encode([
     'nome_completo'   => $usuario['nome_completo'],
     'patente'         => $usuario['patente'],
     'om'              => $usuario['nome_om'],
+    'sigla_om'        => $usuario['sigla_om'],
     'padrao_semanal'  => json_decode($usuario['padrao_semanal'], true) ?? [],
     'excecoes'        => array_merge(
         json_decode($usuario['excecao_semanal'], true) ?? [],

@@ -1,35 +1,11 @@
+<?php $ts = time(); ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <title>Sistema de Arranchamento</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body { font-family: Arial, sans-serif; background:#f4f6f8; margin:0; padding:20px; }
-    h1, h2, h3 { margin-top:0; }
-    .card { background:#fff; border-radius:8px; padding:16px; margin-bottom:20px; box-shadow:0 2px 6px rgba(0,0,0,.1); }
-    table { width:100%; border-collapse:collapse; }
-    th, td { border:1px solid #ddd; padding:8px; text-align:center; }
-    th { background:#eee; }
-    button { padding:8px 14px; border:none; border-radius:6px; cursor:pointer; }
-    button.primary { background:#2e7d32; color:#fff; }
-    button.danger { background:#c62828; color:#fff; }
-    input, select { padding:6px; }
-    dialog { border:none; border-radius:8px; }
-    .topbar {
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    background:#1b5e20;
-    color:#fff;
-    padding:10px 20px;
-    margin:-20px -20px 20px -20px;
-  }
-  .topbar .left { display:flex; align-items:center; gap:10px; }
-  .logo { width:48px; height:48px; border-radius:50%; background:#fff; }
-  .user-info { font-size:14px; }
-  .quartel { font-size:20px; letter-spacing:1px; }
-</style>
+  <link rel="stylesheet" href="style.css?t=<?= $ts ?>">
 </head>
 <body>
 <header class="topbar">
@@ -40,144 +16,156 @@
       <span id="patente-usuario">Cabo</span>
     </div>
   </div>
+  <div class="center">
+    <h1>Arranchamento</h1>
+  </div>
   <div class="right">
     <strong id="om-usuario" class="quartel">3º CGEO</strong>
   </div>
 </header>
 
-<h1>Arranchamento – Cadastro do Militar</h1>
+<div class="layout-arranchamento">
 
-<div class="card">
-  <h2>Padrão Semanal</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Dia</th>
-        <th>Café</th>
-        <th>Almoço</th>
-        <th>Janta</th>
-      </tr>
-    </thead>
-    <tbody id="tabela-semanal"></tbody>
-  </table>
-</div>
+  <div class="col-esquerda">
 
-<div class="card">
-  <h2>Exceções</h2>
-  <button class="primary" onclick="abrirDialog()">Nova Exceção</button>
+    <div class="card">
+      <h2>Padrão Semanal</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Dia</th>
+            <th>Café</th>
+            <th>Almoço</th>
+            <th>Janta</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-semanal"></tbody>
+      </table>
+    </div>
 
-  <table style="margin-top:10px;">
-    <thead>
-      <tr>
-        <th>Tipo</th>
-        <th>Período</th>
-        <th>Refeições</th>
-        <th>Obs.</th>
-        <th>Ação</th>
-      </tr>
-    </thead>
-    <tbody id="lista-excecoes"></tbody>
-  </table>
-</div>
+    <div class="card">
+      <h2>Exceções</h2>
+      <button class="primary" onclick="abrirDialog()">Nova Exceção</button>
 
-<dialog id="dialogExcecao">
-  <h3>Nova Exceção</h3>
+      <table style="margin-top:10px;">
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th>Período</th>
+            <th>Refeições</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+        <tbody id="lista-excecoes"></tbody>
+      </table>
+    </div>
 
-  <label>Tipo
-    <select id="tipoExcecao">
-      <option value="Férias">Férias</option>
-      <option value="Dispensa">Dispensa</option>
-      <option value="Missão">Missão</option>
-    </select>
-  </label><br><br>
+    <dialog id="dialogExcecao">
+      <h3>Nova Exceção</h3>
 
-  <label>Observação<br>
-    <input type="text" id="obsExcecao" style="width:100%;" />
-  </label><br><br>
+      <label>Tipo
+        <select id="tipoExcecao">
+          <option value="Férias">Férias</option>
+          <option value="Dispensa">Dispensa</option>
+          <option value="Missão">Missão</option>
+        </select>
+      </label><br><br>
 
-  <label>Data início <input type="date" id="dataInicio" /></label>
-  <label>Data fim <input type="date" id="dataFim" /></label>
+      <label>Observação<br>
+        <input type="text" id="obsExcecao" style="width:100%;" />
+      </label><br><br>
 
-  <h4>Configuração da exceção</h4>
+      <label>Data início <input type="date" id="dataInicio" /></label>
+      <label>Data fim <input type="date" id="dataFim" /></label>
 
-<label>
-  <input type="radio" name="modoExcecao" value="semanal" checked onclick="toggleModoExcecao()"> Padrão semanal
-</label>
-<label>
-  <input type="radio" name="modoExcecao" value="individual" onclick="toggleModoExcecao()"> Dias individuais
-</label>
+      <h4>Configuração da exceção</h4>
 
-<div id="modo-semanal">
-  <table>
-    <thead>
-      <tr>
-        <th>Dia</th>
-        <th>Café</th>
-        <th>Almoço</th>
-        <th>Janta</th>
-      </tr>
-    </thead>
-    <tbody id="tabela-excecao"></tbody>
-  </table>
-</div>
+    <label>
+      <input type="radio" name="modoExcecao" value="semanal" checked onclick="toggleModoExcecao()"> Padrão semanal
+    </label>
+    <label>
+      <input type="radio" name="modoExcecao" value="individual" onclick="toggleModoExcecao()"> Dias individuais
+    </label>
 
-<div id="modo-individual" style="display:none;">
-  <p>Selecione as refeições para cada dia do período:</p>
-  <table>
-    <thead>
-      <tr>
-        <th>Data</th>
-        <th>Café</th>
-        <th>Almoço</th>
-        <th>Janta</th>
-      </tr>
-    </thead>
-    <tbody id="tabela-individual"></tbody>
-  </table>
-</div>
+    <div id="modo-semanal">
+      <table>
+        <thead>
+          <tr>
+            <th>Dia</th>
+            <th>Café</th>
+            <th>Almoço</th>
+            <th>Janta</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-excecao"></tbody>
+      </table>
+    </div>
 
-  <br>
-  <button class="primary" onclick="salvarExcecao()">Salvar</button>
-  <button onclick="fecharDialog()">Cancelar</button>
-</dialog>
+    <div id="modo-individual" style="display:none;">
+      <p>Selecione as refeições para cada dia do período:</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Café</th>
+            <th>Almoço</th>
+            <th>Janta</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-individual"></tbody>
+      </table>
+    </div>
 
-<div class="card">
-  <button class="primary" onclick="salvar()">Salvar Arranchamento</button>
-</div>
+      <br>
+      <button class="primary" onclick="salvarExcecao()">Salvar</button>
+      <button onclick="fecharDialog()">Cancelar</button>
+    </dialog>
 
-<h3>Simulação do Arranchamento</h3>
+    <div class="card">
+      <button class="primary" onclick="salvar()">Salvar Arranchamento</button>
+    </div>
 
-<div style="margin-bottom:10px">
-  <button id="mes-anterior">◀</button>
-  <strong id="titulo-mes"></strong>
-  <button id="mes-proximo">▶</button>
-</div>
+    </div>
 
-<table border="1" width="100%">
-  <thead>
-    <tr>
-      <th>Data</th>
-      <th>Dia</th>
-      <th>Café</th>
-      <th>Almoço</th>
-      <th>Janta</th>
-    </tr>
-  </thead>
-  <tbody id="tabela-simulacao"></tbody>
-</table>
+    <div class="col-direita">
 
+      <h3>Simulação do Arranchamento</h3>
 
-<dialog id="dialogConfirmacao">
-  <h3>Confirmar exclusão</h3>
-  <p>Deseja realmente excluir esta exceção?</p>
+      <div style="margin-bottom:10px">
+        <button id="mes-anterior">◀</button>
+        <strong id="titulo-mes"></strong>
+        <button id="mes-proximo">▶</button>
+      </div>
 
-  <div style="text-align:right; margin-top:15px">
-    <button id="btnCancelarExclusao">Cancelar</button>
-    <button id="btnConfirmarExclusao" class="danger">Excluir</button>
+      <table border="1" width="100%">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Café</th>
+            <th>Almoço</th>
+            <th>Janta</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-simulacao"></tbody>
+      </table>
+
+    </div>
+
+    <dialog id="dialogConfirmacao">
+      <h3>Confirmar exclusão</h3>
+      <p>Deseja realmente excluir esta exceção?</p>
+
+      <div style="text-align:right; margin-top:15px">
+        <button id="btnCancelarExclusao">Cancelar</button>
+        <button id="btnConfirmarExclusao" class="danger">Excluir</button>
+      </div>
+    </dialog>
+
   </div>
-</dialog>
+
+</div>
 
 
-<script src="app.js"></script>
+<script src="app.js?t=<?= $ts ?>"></script>
 </body>
 </html>

@@ -1,9 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
   carregarUsuario();
-  setTimeout(() => {
-    renderSimulacao();
-  }, 0);
-
 
   //EVENTOS
 
@@ -242,6 +238,7 @@ function salvarExcecao() {
 
   fecharDialog();
   renderExcecoes();
+  renderSimulacao();
 }
 
 /* ================== EXCLUIR / EDITAR ================== */
@@ -249,6 +246,7 @@ function salvarExcecao() {
 function removerExcecao(index) {
   excecoes.splice(index, 1);
   renderExcecoes();
+  renderSimulacao();
 }
 
 function editarExcecao(index) {
@@ -298,43 +296,76 @@ function renderExcecoes() {
     if (e.modo === 'semanal') {
       resumo = e.configuracao
         .filter(d => d.cafe || d.almoco || d.janta)
-        .map(d => `${d.dia}: ${d.cafe?'C ':''}${d.almoco?'A ':''}${d.janta?'J':''}`)
+        .map(d => `${d.dia}: ${d.cafe ? 'C ' : ''}${d.almoco ? 'A ' : ''}${d.janta ? 'J' : ''}`)
         .join('<br>');
     } else {
-      resumo = e.configuracao
+      // 🔵 individual agrupado por data
+      const mapa = {};
+
+      e.configuracao
         .filter(d => d.ativo)
-        .map(d => `${d.data}: ${d.refeicao}`)
+        .forEach(d => {
+          if (!mapa[d.data]) {
+            mapa[d.data] = { cafe: false, almoco: false, janta: false };
+          }
+          mapa[d.data][d.refeicao] = true;
+        });
+
+      resumo = Object.entries(mapa)
+        .map(([data, r]) =>
+          `${data}: ${r.cafe ? 'C ' : ''}${r.almoco ? 'A ' : ''}${r.janta ? 'J' : ''}`.trim()
+        )
         .join('<br>');
     }
 
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
+    const temObs = e.obs && e.obs.trim() !== '';
+
+    /* ===== LINHA PRINCIPAL ===== */
+    const trMain = document.createElement('tr');
+
+    trMain.innerHTML = `
       <td>${e.tipo}</td>
       <td>${e.inicio} a ${e.fim}</td>
-      <td style="text-align:left">${resumo || '-'}</td>
-      <td>${e.obs || '-'}</td>
-      <td></td>
+      <td rowspan="${temObs ? 2 : 1}" style="text-align:left">
+        ${resumo || '-'}
+      </td>
+      <td rowspan="${temObs ? 2 : 1}"></td>
     `;
 
-    const td = tr.querySelector('td:last-child');
+    const tdAcoes = trMain.querySelector('td:last-child');
 
     const btnEditar = document.createElement('button');
     btnEditar.textContent = 'Editar';
+    btnEditar.className = 'primary';
     btnEditar.onclick = () => editarExcecao(index);
 
     const btnExcluir = document.createElement('button');
     btnExcluir.textContent = 'Excluir';
-    btnExcluir.onclick = () => abrirConfirmacaoExclusao(index);
+    btnExcluir.className = 'danger';
+    btnExcluir.onclick = () => removerExcecao(index);
 
-    td.appendChild(btnEditar);
-    td.appendChild(btnExcluir);
+    tdAcoes.appendChild(btnEditar);
+    tdAcoes.appendChild(btnExcluir);
 
-    listaExcecoes.appendChild(tr);
+    listaExcecoes.appendChild(trMain);
+
+    /* ===== LINHA DE OBSERVAÇÃO ===== */
+    if (temObs) {
+      const trObs = document.createElement('tr');
+      trObs.className = 'linha-obs';
+
+      trObs.innerHTML = `
+        <td colspan="2" class="obs-texto">
+          ${e.obs}
+        </td>
+      `;
+
+      listaExcecoes.appendChild(trObs);
+    }
   });
 }
 
 /* ================== LIMPAR DIALOG ================== */
-
 function limparDialog() {
   document.getElementById('obsExcecao').value = '';
   document.getElementById('dataInicio').value = '';
@@ -355,15 +386,19 @@ function carregarUsuario() {
   fetch(`api/get_usuario.php?id=${ID_USUARIO}`)
     .then(r => r.json())
     .then(dados => {
+
+      console.log(dados);
+
       spanNome.textContent = dados.nome;
       spanPatente.textContent = dados.patente;
-      spanOM.textContent = dados.om;
+      spanOM.textContent = dados.sigla_om;
 
       carregarPadraoSemanal(dados.padrao_semanal);
 
       excecoes.length = 0;
       dados.excecoes.forEach(e => excecoes.push(e));
       renderExcecoes();
+      renderSimulacao();
     })
     .catch(() => alert('Erro ao carregar usuário'));
 }
@@ -433,6 +468,7 @@ function getPadraoDia(data) {
 function aplicarExcecaoSemanal(data, base) {
   const dataISO = toISODate(data);
   const diaSemana = diasSemanaJS[data.getDay()];
+  let aplicada = false;
 
   excecoes
     .filter(e =>
@@ -446,16 +482,15 @@ function aplicarExcecaoSemanal(data, base) {
         base.cafe = regra.cafe;
         base.almoco = regra.almoco;
         base.janta = regra.janta;
+        aplicada = true;
       }
     });
 
-  return base;
+  return { base, aplicada };
 }
 
 function aplicarExcecaoDiaria(data, base) {
   const dataISO = toISODate(data);
-
-  // Procura exceção individual válida para o dia
   const excecaoDia = excecoes.find(e =>
     e.modo === 'individual' &&
     e.inicio <= dataISO &&
@@ -463,22 +498,19 @@ function aplicarExcecaoDiaria(data, base) {
     e.configuracao.some(d => d.data === dataISO)
   );
 
-  // Se não existir exceção individual → mantém base
-  if (!excecaoDia) return base;
+  if (!excecaoDia) return { base, aplicada: false };
 
-  // 🔴 PRIORIDADE MÁXIMA → zera tudo
   base.cafe = false;
   base.almoco = false;
   base.janta = false;
 
-  // Aplica SOMENTE o que estiver marcado naquele dia
   excecaoDia.configuracao
     .filter(d => d.data === dataISO && d.ativo)
     .forEach(d => {
       base[d.refeicao] = true;
     });
 
-  return base;
+  return { base, aplicada: true };
 }
 
 function renderSimulacao() {
@@ -486,6 +518,14 @@ function renderSimulacao() {
   const tituloMes = document.getElementById('titulo-mes');
 
   tbody.innerHTML = '';
+
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+
+  // 🔒 não permitir mês passado
+  if (mesAtual < new Date(hoje.getFullYear(), hoje.getMonth(), 1)) {
+    mesAtual = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+  }
 
   const ano = mesAtual.getFullYear();
   const mes = mesAtual.getMonth();
@@ -495,22 +535,71 @@ function renderSimulacao() {
     year: 'numeric'
   });
 
-  const hoje = new Date();
-  const inicio = new Date(ano, mes, mes === hoje.getMonth() ? hoje.getDate() : 1);
-  const fim = new Date(ano, mes + 1, 0);
+  const inicioMes = new Date(ano, mes, 1);
+  const fimMes = new Date(ano, mes + 1, 0);
 
-  for (let d = new Date(inicio); d <= fim; d.setDate(d.getDate() + 1)) {
-    let base = getPadraoDia(d);
-    if (!base) continue;
+  const inicio =
+    ano === hoje.getFullYear() && mes === hoje.getMonth()
+      ? new Date(hoje)
+      : new Date(inicioMes);
 
-    base = aplicarExcecaoSemanal(d, base);
-    base = aplicarExcecaoDiaria(d, base);
+  for (let d = new Date(inicio); d <= fimMes; d.setDate(d.getDate() + 1)) {
+
+    // 🔁 base NOVA por dia (clonada)
+    const padrao = getPadraoDia(d);
+    if (!padrao) continue;
+
+    let base = { ...padrao };
+
+    let temSemanal = false;
+    let temIndividual = false;
+
+    const dataISO = d.toISOString().split('T')[0];
+    const diaSemana = diasSemanaJS[d.getDay()];
+
+    // 🟠 exceção semanal
+    excecoes.forEach(e => {
+      if (e.modo !== 'semanal') return;
+      if (dataISO < e.inicio || dataISO > e.fim) return;
+
+      const conf = e.configuracao.find(c => c.dia === diaSemana);
+      if (conf) {
+        base = {
+          cafe: conf.cafe,
+          almoco: conf.almoco,
+          janta: conf.janta
+        };
+        temSemanal = true;
+      }
+    });
+
+    // 🔵 exceção individual (prioridade máxima)
+    excecoes.forEach(e => {
+      if (e.modo !== 'individual') return;
+      if (dataISO < e.inicio || dataISO > e.fim) return;
+
+      const registros = e.configuracao.filter(r => r.data === dataISO);
+      if (registros.length) {
+        base = { cafe: false, almoco: false, janta: false };
+
+        registros.forEach(r => {
+          if (r.ativo) base[r.refeicao] = true;
+        });
+
+        temIndividual = true;
+      }
+    });
 
     const tr = document.createElement('tr');
 
+    if (temIndividual) {
+      tr.classList.add('simulacao-individual');
+    } else if (temSemanal) {
+      tr.classList.add('simulacao-semanal');
+    }
+
     tr.innerHTML = `
-      <td>${d.toISOString().split('T')[0]}</td>
-      <td>${diasSemanaJS[d.getDay()]}</td>
+      <td>${dataISO} ${diaSemana}</td>
       <td>${base.cafe ? '✔️' : '-'}</td>
       <td>${base.almoco ? '✔️' : '-'}</td>
       <td>${base.janta ? '✔️' : '-'}</td>
@@ -518,6 +607,7 @@ function renderSimulacao() {
 
     tbody.appendChild(tr);
   }
+
   atualizarBotoesMes();
 }
 

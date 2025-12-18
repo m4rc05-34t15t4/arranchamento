@@ -1,0 +1,88 @@
+body { font-family: Arial, sans-serif; background:#f4f6f8; margin:0; padding:20px; }
+h1, h2, h3 { margin-top:0; }
+.card { background:#fff; border-radius:8px; padding:16px; margin-bottom:20px; box-shadow:0 2px 6px rgba(0,0,0,.1); max-width: 600px;}
+table { width:100%; border-collapse:collapse; }
+th, td { border:1px solid #ddd; padding:8px; text-align:center; }
+th { background:#eee; }
+button { padding:8px 14px; border:none; border-radius:6px; cursor:pointer; }
+button.primary { background:#2e7d32; color:#fff; margin: 5px 5px 0 0; }
+button.danger { background:#c62828; color:#fff; margin: 5px 5px 0 0; }
+input, select { padding:6px; }
+dialog { border:none; border-radius:8px; }
+.topbar {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#1b5e20;
+    color:#fff;
+    padding:10px 20px;
+    margin:-20px -20px 20px -20px;
+}
+.topbar .left { display:flex; align-items:center; gap:10px; }
+.logo { width:48px; height:48px; border-radius:50%; background:#fff; }
+.user-info { font-size:14px; }
+.quartel { font-size:20px; letter-spacing:1px; }
+/* === EXCEÇÕES (LISTA) === */
+.excecao-semanal {
+border-left: 6px solid #f6c97a; /* laranja claro */
+}
+.excecao-individual {
+border-left: 6px solid #9ec9ff; /* azul claro */
+}
+/* === SIMULAÇÃO === */
+.simulacao-semanal {
+background-color: #fff3e0; /* laranja claro */
+border-left: 5px solid #fb8c00;
+}
+.simulacao-individual {
+background-color: #e3f2fd; /* azul claro */
+border-left: 5px solid #1e88e5;
+}
+.linha-obs td {
+  background-color: #fafafa;
+  font-style: italic;
+  font-size: 0.9em;
+  color: #555;
+}
+.obs-texto {
+  padding-left: 12px;
+}
+
+.layout-arranchamento {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 16px;
+  align-items: start;
+}
+
+/* Coluna esquerda */
+.col-esquerda {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Coluna direita */
+.col-direita {
+  position: sticky;
+  top: 16px;
+}
+
+/* Cards visuais */
+.card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+/* Mobile */
+@media (max-width: 900px) {
+  .layout-arranchamento {
+    grid-template-columns: 1fr;
+  }
+
+  .col-direita {
+    position: static;
+  }
+}
