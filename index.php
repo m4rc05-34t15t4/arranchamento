@@ -36,12 +36,12 @@
   <div class="left">
     <img src="avatar.png" alt="Logo" class="logo">
     <div class="user-info">
-      <strong id="nomeUsuario">Cb Marcos Batista</strong><br>
-      <span id="postoGraduacao">Cabo</span>
+      <strong id="nome-usuario">Cb Marcos Batista</strong><br>
+      <span id="patente-usuario">Cabo</span>
     </div>
   </div>
   <div class="right">
-    <strong class="quartel">3º CGEO</strong>
+    <strong id="om-usuario" class="quartel">3º CGEO</strong>
   </div>
 </header>
 
@@ -144,6 +144,39 @@
 <div class="card">
   <button class="primary" onclick="salvar()">Salvar Arranchamento</button>
 </div>
+
+<h3>Simulação do Arranchamento</h3>
+
+<div style="margin-bottom:10px">
+  <button id="mes-anterior">◀</button>
+  <strong id="titulo-mes"></strong>
+  <button id="mes-proximo">▶</button>
+</div>
+
+<table border="1" width="100%">
+  <thead>
+    <tr>
+      <th>Data</th>
+      <th>Dia</th>
+      <th>Café</th>
+      <th>Almoço</th>
+      <th>Janta</th>
+    </tr>
+  </thead>
+  <tbody id="tabela-simulacao"></tbody>
+</table>
+
+
+<dialog id="dialogConfirmacao">
+  <h3>Confirmar exclusão</h3>
+  <p>Deseja realmente excluir esta exceção?</p>
+
+  <div style="text-align:right; margin-top:15px">
+    <button id="btnCancelarExclusao">Cancelar</button>
+    <button id="btnConfirmarExclusao" class="danger">Excluir</button>
+  </div>
+</dialog>
+
 
 <script src="app.js"></script>
 </body>

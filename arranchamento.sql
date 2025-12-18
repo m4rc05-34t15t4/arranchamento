@@ -5,7 +5,7 @@
 -- Dumped from database version 9.5.25
 -- Dumped by pg_dump version 14.4
 
--- Started on 2025-12-17 10:45:40
+-- Started on 2025-12-18 11:58:43
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -175,6 +175,7 @@ ALTER TABLE ONLY public.usuarios ALTER COLUMN id SET DEFAULT nextval('public.usu
 --
 
 COPY public.om (id_om, nome_om, sigla_om) FROM stdin;
+1	3º Centro de Geoinformação	3ºCGEO
 \.
 
 
@@ -209,6 +210,7 @@ COPY public.patentes (id, nome, ordem) FROM stdin;
 --
 
 COPY public.usuarios (id, nome_guerra, nome_completo, idt_mil, cpf, email, senha, id_om, id_patente, padrao_semanal, excecao_semanal, excecao_diaria, ativo) FROM stdin;
+2	BATISTA	Marcos Batista da Silva	EB123456	12345678901	marcos.batista@eb.mil.br	123	1	11	[{"dia": "Segunda", "cafe": false, "janta": false, "almoco": true}, {"dia": "Terça", "cafe": true, "janta": false, "almoco": true}, {"dia": "Quarta", "cafe": true, "janta": false, "almoco": false}, {"dia": "Quinta", "cafe": true, "janta": false, "almoco": false}, {"dia": "Sexta", "cafe": true, "janta": false, "almoco": true}, {"dia": "Sábado", "cafe": false, "janta": false, "almoco": false}, {"dia": "Domingo", "cafe": false, "janta": false, "almoco": false}]	[{"fim": "2025-12-23", "obs": "", "modo": "semanal", "tipo": "Férias", "inicio": "2025-12-17", "configuracao": [{"dia": "Segunda", "cafe": false, "janta": true, "almoco": false}, {"dia": "Terça", "cafe": false, "janta": false, "almoco": true}, {"dia": "Quarta", "cafe": true, "janta": true, "almoco": false}, {"dia": "Quinta", "cafe": false, "janta": false, "almoco": true}, {"dia": "Sexta", "cafe": true, "janta": true, "almoco": false}, {"dia": "Sábado", "cafe": false, "janta": false, "almoco": true}, {"dia": "Domingo", "cafe": true, "janta": false, "almoco": false}]}]	[{"fim": "2025-12-27", "obs": "", "modo": "individual", "tipo": "Férias", "inicio": "2025-12-25", "configuracao": [{"data": "2025-12-25", "ativo": true, "refeicao": "cafe"}, {"data": "2025-12-25", "ativo": false, "refeicao": "almoco"}, {"data": "2025-12-25", "ativo": false, "refeicao": "janta"}, {"data": "2025-12-26", "ativo": false, "refeicao": "cafe"}, {"data": "2025-12-26", "ativo": true, "refeicao": "almoco"}, {"data": "2025-12-26", "ativo": false, "refeicao": "janta"}, {"data": "2025-12-27", "ativo": false, "refeicao": "cafe"}, {"data": "2025-12-27", "ativo": false, "refeicao": "almoco"}, {"data": "2025-12-27", "ativo": true, "refeicao": "janta"}]}]	t
 \.
 
 
@@ -218,7 +220,7 @@ COPY public.usuarios (id, nome_guerra, nome_completo, idt_mil, cpf, email, senha
 -- Name: om_id_om_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.om_id_om_seq', 1, false);
+SELECT pg_catalog.setval('public.om_id_om_seq', 1, true);
 
 
 --
@@ -236,7 +238,7 @@ SELECT pg_catalog.setval('public.patentes_id_seq', 14, true);
 -- Name: usuarios_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.usuarios_id_seq', 1, false);
+SELECT pg_catalog.setval('public.usuarios_id_seq', 2, true);
 
 
 --
@@ -332,7 +334,7 @@ GRANT ALL ON SCHEMA public TO postgres;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
--- Completed on 2025-12-17 10:45:40
+-- Completed on 2025-12-18 11:58:43
 
 --
 -- PostgreSQL database dump complete

@@ -65,3 +65,43 @@ INSERT INTO patentes (nome, ordem) VALUES
 ('MAJ', 12),
 ('TEN-CEL', 13),
 ('CEL', 14);
+
+
+INSERT INTO public.usuarios (
+    nome_guerra,
+    nome_completo,
+    idt_mil,
+    cpf,
+    email,
+    senha,
+    id_om,
+    id_patente,
+    padrao_semanal,
+    excecao_semanal,
+    excecao_diaria,
+    ativo
+) VALUES (
+    'BATISTA',
+    'Marcos Batista da Silva',
+    'EB123456',
+    '12345678901',
+    'marcos.batista@eb.mil.br',
+    '$2y$10$abcdefghijklmnopqrstuv', -- hash da senha
+    1,  -- id_om
+    11, -- CAP
+    '[]'::jsonb,
+    '[]'::jsonb,
+    '[]'::jsonb,
+    true
+);
+
+
+INSERT INTO public.om (
+    nome_om,
+    sigla_om
+) VALUES (
+    '3º Centro de Geoinformação',
+    '3ºCGEO'
+);
+
+
