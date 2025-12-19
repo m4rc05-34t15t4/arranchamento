@@ -1,31 +1,56 @@
 function extrairPatente(nomeCompleto) {
-    const patentes = [
-      'Cap',
-      '1º Ten',
-      '2º Ten',
-      '1º Sgt',
-      '2º Sgt',
-      '3º Sgt',
-      'Sd'
-    ];
-  
-    for (const p of patentes) {
-      if (nomeCompleto.startsWith(p)) {
-        return p;
-      }
+  const patentes = [
+    'Cap',
+    '1º Ten',
+    '2º Ten',
+    '1º Sgt',
+    '2º Sgt',
+    '3º Sgt',
+    'Sd'
+  ];
+
+  for (const p of patentes) {
+    if (nomeCompleto.startsWith(p)) {
+      return p;
     }
-  
-    return 'Não informado';
   }
 
-  function limparNome(nomeCompleto, patente) {
-    return nomeCompleto.replace(patente, '').trim();
-  }
-  
+  return 'Não informado';
+}
 
+function limparNome(nomeCompleto, patente) {
+  return nomeCompleto.replace(patente, '').trim();
+}
 
 const usuarios = [
-    {
+  {
+    nomeCompleto: 'Cap BUARQUE',
+    om: '3º CGEO',
+    padrao: { cafe: true, almoco: true, janta: false }
+  },
+  {
+    nomeCompleto: '1º Ten AZEVEDO',
+    om: '3º CGEO',
+    padrao: { cafe: true, almoco: true, janta: true }
+  },
+  {
+    nomeCompleto: '2º Sgt MARCOS BATISTA',
+    om: '3º CGEO',
+    padrao: { cafe: true, almoco: true, janta: true },
+    excecao: { almoco: true }
+  },
+  {
+    nomeCompleto: 'Sd EV Plantão 1',
+    om: '3º CGEO',
+    padrao: { cafe: true, almoco: true, janta: true }
+  },
+  {
+    nomeCompleto: 'Sd EV Cozinheiro',
+    om: '3º CGEO',
+    padrao: { cafe: true, almoco: true, janta: true },
+    excecao: { cafe: true, almoco: true }
+  },
+  {
       nomeCompleto: 'Cap BUARQUE',
       om: '3º CGEO',
       padrao: { cafe: true, almoco: true, janta: false }
@@ -53,68 +78,41 @@ const usuarios = [
       excecao: { cafe: true, almoco: true }
     },
     {
-        nomeCompleto: 'Cap BUARQUE',
-        om: '3º CGEO',
-        padrao: { cafe: true, almoco: true, janta: false }
-      },
-      {
-        nomeCompleto: '1º Ten AZEVEDO',
-        om: '3º CGEO',
-        padrao: { cafe: true, almoco: true, janta: true }
-      },
-      {
-        nomeCompleto: '2º Sgt MARCOS BATISTA',
-        om: '3º CGEO',
-        padrao: { cafe: true, almoco: true, janta: true },
-        excecao: { almoco: true }
-      },
-      {
-        nomeCompleto: 'Sd EV Plantão 1',
-        om: '3º CGEO',
-        padrao: { cafe: true, almoco: true, janta: true }
-      },
-      {
-        nomeCompleto: 'Sd EV Cozinheiro',
-        om: '3º CGEO',
-        padrao: { cafe: true, almoco: true, janta: true },
-        excecao: { cafe: true, almoco: true }
-      },
-      {
-        nomeCompleto: 'Cap BUARQUE',
-        om: '3º CGEO',
-        padrao: { cafe: true, almoco: true, janta: false }
-      },
-      {
-        nomeCompleto: '1º Ten AZEVEDO',
-        om: '3º CGEO',
-        padrao: { cafe: true, almoco: true, janta: true }
-      },
-      {
-        nomeCompleto: '2º Sgt MARCOS BATISTA',
-        om: '3º CGEO',
-        padrao: { cafe: true, almoco: true, janta: true },
-        excecao: { almoco: true }
-      },
-      {
-        nomeCompleto: 'Sd EV Plantão 1',
-        om: '3º CGEO',
-        padrao: { cafe: true, almoco: true, janta: true }
-      },
-      {
-        nomeCompleto: 'Sd EV Cozinheiro',
-        om: '3º CGEO',
-        padrao: { cafe: true, almoco: true, janta: true },
-        excecao: { cafe: true, almoco: true }
-      }
-  ].map(u => {
-    const patente = extrairPatente(u.nomeCompleto);
-  
-    return {
-      ...u,
-      patente,
-      nome: limparNome(u.nomeCompleto, patente)
-    };
-  });
+      nomeCompleto: 'Cap BUARQUE',
+      om: '3º CGEO',
+      padrao: { cafe: true, almoco: true, janta: false }
+    },
+    {
+      nomeCompleto: '1º Ten AZEVEDO',
+      om: '3º CGEO',
+      padrao: { cafe: true, almoco: true, janta: true }
+    },
+    {
+      nomeCompleto: '2º Sgt MARCOS BATISTA',
+      om: '3º CGEO',
+      padrao: { cafe: true, almoco: true, janta: true },
+      excecao: { almoco: true }
+    },
+    {
+      nomeCompleto: 'Sd EV Plantão 1',
+      om: '3º CGEO',
+      padrao: { cafe: true, almoco: true, janta: true }
+    },
+    {
+      nomeCompleto: 'Sd EV Cozinheiro',
+      om: '3º CGEO',
+      padrao: { cafe: true, almoco: true, janta: true },
+      excecao: { cafe: true, almoco: true }
+    }
+].map(u => {
+  const patente = extrairPatente(u.nomeCompleto);
+
+  return {
+    ...u,
+    patente,
+    nome: limparNome(u.nomeCompleto, patente)
+  };
+});
 
   console.log('dados simlados:', usuarios);
   
@@ -156,7 +154,6 @@ const usuarios = [
   
       tr.innerHTML = `
         <td>${u.nome}</td>
-        <td>${u.om}</td>
         <td>${refeicoes.cafe ? 'SIM' : '-'}</td>
         <td>${refeicoes.almoco ? 'SIM' : '-'}</td>
         <td>${refeicoes.janta ? 'SIM' : '-'}</td>

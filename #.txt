@@ -105,3 +105,101 @@ INSERT INTO public.om (
 );
 
 
+CREATE TABLE relatorios (
+    id SERIAL PRIMARY KEY,
+
+    -- Data do relatório (apenas dia/mês/ano)
+    data_relatorio DATE NOT NULL,
+
+    -- Identificador da OM
+    id_om INTEGER NOT NULL,
+
+    -- Lista de usuários e refeições em JSON
+    -- Exemplo:
+    -- {
+    --   "1": "CAJ",
+    --   "2": "C",
+    --   "3": "AJ"
+    -- }
+    usuarios_refeicoes JSONB NOT NULL,
+
+    -- Data e hora da última atualização
+    data_atualizacao TIMESTAMP WITHOUT TIME ZONE
+        DEFAULT CURRENT_TIMESTAMP,
+
+    -- Responsável pelo relatório
+    id_responsavel INTEGER NOT NULL
+);
+
+
+INSERT INTO usuarios (
+    nome_guerra,
+    nome_completo,
+    idt_mil,
+    cpf,
+    email,
+    senha,
+    id_om,
+    id_patente,
+    padrao_semanal,
+    excecao_semanal,
+    excecao_diaria
+) VALUES
+('CB SILVA',   'Carlos Alberto da Silva',   'MIL001', '00000000001', 'silva@exemplo.mil.br',   'hash123', 1, 10,
+ '{"seg":"CAJ","ter":"CAJ","qua":"CAJ","qui":"CAJ","sex":"CAJ"}', NULL, NULL),
+
+('SD SOUZA',   'João Pedro Souza',           'MIL002', '00000000002', 'souza@exemplo.mil.br',   'hash123', 1, 9,
+ '{"seg":"CA","ter":"CA","qua":"CA","qui":"CA","sex":"CA"}', NULL, NULL),
+
+('3º SGT LIMA','Marcos Lima Ferreira',       'MIL003', '00000000003', 'lima@exemplo.mil.br',    'hash123', 1, 8,
+ '{"seg":"AJ","ter":"AJ","qua":"AJ","qui":"AJ","sex":"AJ"}', NULL, NULL),
+
+('CB ROCHA',   'André Rocha Santos',         'MIL004', '00000000004', 'rocha@exemplo.mil.br',   'hash123', 1, 7,
+ '{"seg":"C","ter":"C","qua":"C","qui":"C","sex":"C"}', NULL, NULL),
+
+('SD COSTA',   'Lucas Costa Almeida',        'MIL005', '00000000005', 'costa@exemplo.mil.br',   'hash123', 1, 6,
+ '{"seg":"CAJ","ter":"CA","qua":"AJ","qui":"CAJ","sex":"C"}', NULL, NULL),
+
+('CB PEREIRA', 'Rafael Pereira Lima',        'MIL006', '00000000006', 'pereira@exemplo.mil.br', 'hash123', 1, 5,
+ '{"seg":"AJ","ter":"AJ","qua":"AJ","qui":"AJ","sex":"AJ"}', NULL, NULL),
+
+('SD OLIVEIRA','Felipe Oliveira Nunes',      'MIL007', '00000000007', 'oliveira@exemplo.mil.br','hash123', 1, 4,
+ '{"seg":"CA","ter":"CA","qua":"CA","qui":"CA","sex":"CA"}', NULL, NULL),
+
+('CB RIBEIRO', 'Thiago Ribeiro Melo',        'MIL008', '00000000008', 'ribeiro@exemplo.mil.br', 'hash123', 1, 3,
+ '{"seg":"C","ter":"C","qua":"C","qui":"C","sex":"C"}', NULL, NULL),
+
+('SD BARROS',  'Daniel Barros Teixeira',     'MIL009', '00000000009', 'barros@exemplo.mil.br',  'hash123', 1, 2,
+ '{"seg":"CAJ","ter":"CAJ","qua":"CAJ","qui":"CAJ","sex":"CAJ"}', NULL, NULL),
+
+('CB MORAES',  'Henrique Moraes Pacheco',    'MIL010', '00000000010', 'moraes@exemplo.mil.br',  'hash123', 1, 1,
+ '{"seg":"AJ","ter":"AJ","qua":"AJ","qui":"AJ","sex":"AJ"}', NULL, NULL);
+
+
+
+INSERT INTO relatorios (
+    data_relatorio,
+    id_om,
+    usuarios_refeicoes,
+    id_responsavel
+)
+SELECT
+    (date_trunc('month', CURRENT_DATE)::date + (gs - 1)) AS data_relatorio,
+    1 AS id_om,
+    jsonb_build_object(
+        '1','CAJ',
+        '2','C',
+        '3','AJ',
+        '4','C',
+        '5','CAJ',
+        '6','AJ',
+        '7','CA',
+        '8','C',
+        '9','CAJ',
+        '10','AJ'
+    ) AS usuarios_refeicoes,
+    1 AS id_responsavel
+FROM generate_series(1, 10) gs;
+
+
+

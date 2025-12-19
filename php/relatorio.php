@@ -25,7 +25,6 @@
         <thead>
           <tr>
             <th>Usuário</th>
-            <th>OM</th>
             <th>C</th>
             <th>A</th>
             <th>J</th>
@@ -38,7 +37,6 @@
         <thead>
           <tr>
             <th>Usuário</th>
-            <th>OM</th>
             <th>C</th>
             <th>A</th>
             <th>J</th>
