@@ -15,8 +15,35 @@ document.addEventListener('DOMContentLoaded', () => {
   
   document.getElementById('dataFim')
     .addEventListener('change', atualizarDiasSemanaExcecao);
-  
 
+    document.getElementById('dataInicio').addEventListener('change', () => {
+      const inicio = document.getElementById('dataInicio');
+      const fim = document.getElementById('dataFim');
+      if (!inicio.value) return;
+      // fim nunca pode ser antes do início
+      fim.min = inicio.value;
+      if (fim.value && fim.value < inicio.value) {
+        fim.value = inicio.value;
+      }
+      gerarDiasIndividuais(); // se estiver no modo individual
+    });
+
+    document.getElementById('dataFim').addEventListener('change', () => {
+      const inicio = document.getElementById('dataInicio');
+      const fim = document.getElementById('dataFim');
+      if (!fim.value) return;
+      const hoje = new Date().toISOString().slice(0, 10);
+      // ❌ não permitir data fim antes de hoje
+      if (fim.value < hoje) {
+        fim.value = hoje;
+      }
+      // ❌ não permitir fim antes do início
+      if (inicio.value && fim.value < inicio.value) {
+        inicio.value = fim.value;
+      }
+      gerarDiasIndividuais();
+    });
+    
 
 });
 
@@ -56,11 +83,18 @@ dias.forEach((dia, i) => {
   const tr = document.createElement('tr');
   tr.innerHTML = `
     <td>${dia}</td>
-    <td><input type="checkbox" id="cafe-${i}"></td>
-    <td><input type="checkbox" id="almoco-${i}"></td>
-    <td><input type="checkbox" id="janta-${i}"></td>
+    <td><input class="check-padrao-semanal" type="checkbox" id="cafe-${i}"></td>
+    <td><input class="check-padrao-semanal" type="checkbox" id="almoco-${i}"></td>
+    <td><input class="check-padrao-semanal" type="checkbox" id="janta-${i}"></td>
   `;
   tabelaSemanal.appendChild(tr);
+});
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.check-padrao-semanal').forEach(checkbox => {
+      checkbox.addEventListener('change', function () {
+          salvar();
+      });
+  });
 });
 
 /* ================== PADRÃO SEMANAL DA EXCEÇÃO ================== */
@@ -80,6 +114,17 @@ dias.forEach((dia, i) => {
 
 function abrirDialog() {
   limparDialog();
+  
+  //definir data calendario
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+  const fim = new Date(hoje);
+  fim.setDate(fim.getDate() + 7);
+  document.getElementById('dataInicio').value =
+    hoje.toISOString().split('T')[0];
+  document.getElementById('dataFim').value =
+    fim.toISOString().split('T')[0];
+  toggleModoExcecao();
   dialog.showModal();
 }
 
@@ -142,7 +187,7 @@ function gerarDiasIndividuais() {
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${dataISO} (${diaSemana})</td>
+      <td>${dataISO} ${diaSemana.toUpperCase().slice(0, 3)}</td>
       <td><input type="checkbox" data-data="${dataISO}" data-ref="cafe"></td>
       <td><input type="checkbox" data-data="${dataISO}" data-ref="almoco"></td>
       <td><input type="checkbox" data-data="${dataISO}" data-ref="janta"></td>
@@ -206,6 +251,14 @@ function salvarExcecao() {
     return;
   }
 
+  const hoje = new Date().toISOString().slice(0, 10);
+
+  // ❌ não permitir exceção terminando no passado
+  if (fim < hoje) {
+    alert('A data de fim não pode ser anterior à data de hoje');
+    return;
+  }
+
   let configuracao = [];
 
   if (modo === 'semanal') {
@@ -239,7 +292,9 @@ function salvarExcecao() {
   fecharDialog();
   renderExcecoes();
   renderSimulacao();
+  salvar();
 }
+
 
 /* ================== EXCLUIR / EDITAR ================== */
 
@@ -290,13 +345,23 @@ function editarExcecao(index) {
 function renderExcecoes() {
   listaExcecoes.innerHTML = '';
 
+  const hoje = new Date().toISOString().slice(0, 10);
+
   excecoes.forEach((e, index) => {
+
+    // ⛔ não renderiza exceções encerradas no passado
+    if (e.fim < hoje) return;
+
     let resumo = '';
 
+    /* ===== RESUMO DAS REFEIÇÕES ===== */
     if (e.modo === 'semanal') {
       resumo = e.configuracao
         .filter(d => d.cafe || d.almoco || d.janta)
-        .map(d => `${d.dia}: ${d.cafe ? 'C ' : ''}${d.almoco ? 'A ' : ''}${d.janta ? 'J' : ''}`)
+        .map(d =>
+          `${d.dia.toUpperCase().slice(0, 3)}: ` +
+          `${d.cafe ? 'C ' : ''}${d.almoco ? 'A ' : ''}${d.janta ? 'J' : ''}`.trim()
+        )
         .join('<br>');
     } else {
       // 🔵 individual agrupado por data
@@ -320,19 +385,29 @@ function renderExcecoes() {
 
     const temObs = e.obs && e.obs.trim() !== '';
 
+    /* ===== CLASSE DE COR ===== */
+    const classeLinha =
+      e.modo === 'individual'
+        ? 'simulacao-individual'
+        : 'simulacao-semanal';
+
     /* ===== LINHA PRINCIPAL ===== */
     const trMain = document.createElement('tr');
+    trMain.classList.add(classeLinha);
 
     trMain.innerHTML = `
-      <td>${e.tipo}</td>
-      <td>${e.inicio} a ${e.fim}</td>
-      <td rowspan="${temObs ? 2 : 1}" style="text-align:left">
+      <td class="lista-excessoes-td-refeicao" rowspan="${temObs ? 2 : 1}">
         ${resumo || '-'}
       </td>
-      <td rowspan="${temObs ? 2 : 1}"></td>
+      <td class="lista-excessoes-td-tipo">${e.tipo}</td>
+      <td class="lista-excessoes-td-periodo">
+        ${e.inicio}<br>${e.fim}
+      </td>
+      <td class="lista-excessoes-td-acao"></td>
     `;
 
-    const tdAcoes = trMain.querySelector('td:last-child');
+    /* ===== AÇÕES ===== */
+    const tdAcoes = trMain.querySelector('.lista-excessoes-td-acao');
 
     const btnEditar = document.createElement('button');
     btnEditar.textContent = 'Editar';
@@ -352,14 +427,12 @@ function renderExcecoes() {
     /* ===== LINHA DE OBSERVAÇÃO ===== */
     if (temObs) {
       const trObs = document.createElement('tr');
-      trObs.className = 'linha-obs';
-
+      trObs.className = `linha-obs ${classeLinha}`;
       trObs.innerHTML = `
-        <td colspan="2" class="obs-texto">
+        <td colspan="3" class="lista-excessoes-td-observacao">
           ${e.obs}
         </td>
       `;
-
       listaExcecoes.appendChild(trObs);
     }
   });
@@ -436,7 +509,8 @@ function salvar() {
   .then(r => r.json())
   .then(res => {
     if (res.status === 'ok') {
-      alert('Arranchamento salvo com sucesso!');
+      console.log(new Date().toLocaleString('pt-BR'), 'Arranchamento salvo com sucesso!');
+      //alert('Arranchamento salvo com sucesso!');
     } else {
       alert(res.erro || 'Erro ao salvar');
     }
@@ -589,22 +663,18 @@ function renderSimulacao() {
         temIndividual = true;
       }
     });
-
     const tr = document.createElement('tr');
-
     if (temIndividual) {
       tr.classList.add('simulacao-individual');
     } else if (temSemanal) {
       tr.classList.add('simulacao-semanal');
     }
-
     tr.innerHTML = `
       <td>${dataISO} ${diaSemana}</td>
       <td>${base.cafe ? '✔️' : '-'}</td>
       <td>${base.almoco ? '✔️' : '-'}</td>
       <td>${base.janta ? '✔️' : '-'}</td>
     `;
-
     tbody.appendChild(tr);
   }
 
