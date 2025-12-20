@@ -5,7 +5,7 @@
 -- Dumped from database version 17.4
 -- Dumped by pg_dump version 17.1
 
--- Started on 2025-12-19 18:03:06
+-- Started on 2025-12-19 21:30:33
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -264,15 +264,15 @@ COPY public.patentes (id, nome, ordem) FROM stdin;
 
 COPY public.relatorios (id, data_relatorio, id_om, usuarios_refeicoes, data_atualizacao, id_responsavel) FROM stdin;
 1	2025-12-01	1	{"1": "CAJ", "2": "C", "3": "AJ", "4": "C", "5": "CAJ", "6": "AJ", "7": "CA", "8": "C", "9": "CAJ", "10": "AJ"}	2025-12-19 17:46:33.491439	1
-2	2025-12-02	1	{"1": "CAJ", "2": "C", "3": "AJ", "4": "C", "5": "CAJ", "6": "AJ", "7": "CA", "8": "C", "9": "CAJ", "10": "AJ"}	2025-12-19 17:46:33.491439	1
 3	2025-12-03	1	{"1": "CAJ", "2": "C", "3": "AJ", "4": "C", "5": "CAJ", "6": "AJ", "7": "CA", "8": "C", "9": "CAJ", "10": "AJ"}	2025-12-19 17:46:33.491439	1
-4	2025-12-04	1	{"1": "CAJ", "2": "C", "3": "AJ", "4": "C", "5": "CAJ", "6": "AJ", "7": "CA", "8": "C", "9": "CAJ", "10": "AJ"}	2025-12-19 17:46:33.491439	1
 5	2025-12-05	1	{"1": "CAJ", "2": "C", "3": "AJ", "4": "C", "5": "CAJ", "6": "AJ", "7": "CA", "8": "C", "9": "CAJ", "10": "AJ"}	2025-12-19 17:46:33.491439	1
-6	2025-12-06	1	{"1": "CAJ", "2": "C", "3": "AJ", "4": "C", "5": "CAJ", "6": "AJ", "7": "CA", "8": "C", "9": "CAJ", "10": "AJ"}	2025-12-19 17:46:33.491439	1
-7	2025-12-07	1	{"1": "CAJ", "2": "C", "3": "AJ", "4": "C", "5": "CAJ", "6": "AJ", "7": "CA", "8": "C", "9": "CAJ", "10": "AJ"}	2025-12-19 17:46:33.491439	1
 8	2025-12-08	1	{"1": "CAJ", "2": "C", "3": "AJ", "4": "C", "5": "CAJ", "6": "AJ", "7": "CA", "8": "C", "9": "CAJ", "10": "AJ"}	2025-12-19 17:46:33.491439	1
-9	2025-12-09	1	{"1": "CAJ", "2": "C", "3": "AJ", "4": "C", "5": "CAJ", "6": "AJ", "7": "CA", "8": "C", "9": "CAJ", "10": "AJ"}	2025-12-19 17:46:33.491439	1
-10	2025-12-10	1	{"1": "CAJ", "2": "C", "3": "AJ", "4": "C", "5": "CAJ", "6": "AJ", "7": "CA", "8": "C", "9": "CAJ", "10": "AJ"}	2025-12-19 17:46:33.491439	1
+2	2025-12-02	1	{"1": "CAJ", "3": "AJ", "4": "C", "5": "CAJ", "6": "AJ", "7": "CA", "8": "C", "9": "CAJ", "10": "AJ", "20": "C"}	2025-12-19 17:46:33.491439	1
+7	2025-12-07	1	{"1": "CAJ", "3": "AJ", "4": "C", "5": "CAJ", "6": "AJ", "7": "CA", "8": "C", "9": "CAJ", "10": "AJ", "20": "C"}	2025-12-19 17:46:33.491439	1
+10	2025-12-10	1	{"1": "CAJ", "3": "AJ", "4": "C", "5": "CAJ", "6": "AJ", "7": "CA", "8": "C", "9": "CAJ", "10": "AJ", "20": "C"}	2025-12-19 17:46:33.491439	1
+4	2025-12-04	1	{"1": "CAJ", "2": "CAJ", "3": "AJ", "4": "C", "5": "CAJ", "6": "AJ", "7": "CA", "8": "C", "9": "CAJ", "10": "AJ"}	2025-12-19 17:46:33.491439	1
+6	2025-12-06	1	{"1": "CAJ", "2": "CJ", "3": "AJ", "4": "C", "5": "CAJ", "6": "AJ", "7": "CA", "8": "C", "9": "CAJ", "10": "AJ"}	2025-12-19 17:46:33.491439	1
+9	2025-11-19	1	{"1": "CAJ", "2": "AJ", "3": "AJ", "4": "C", "5": "CAJ", "6": "AJ", "7": "CA", "8": "C", "9": "CAJ", "10": "AJ"}	2025-12-19 17:46:33.491439	1
 \.
 
 
@@ -283,7 +283,6 @@ COPY public.relatorios (id, data_relatorio, id_om, usuarios_refeicoes, data_atua
 --
 
 COPY public.usuarios (id, nome_guerra, nome_completo, idt_mil, cpf, email, senha, id_om, id_patente, padrao_semanal, excecao_semanal, excecao_diaria, ativo) FROM stdin;
-2	BATISTA	Marcos Batista da Silva	EB123456	12345678901	marcos.batista@eb.mil.br	123	1	11	[{"dia": "Segunda", "cafe": false, "janta": false, "almoco": true}, {"dia": "Terça", "cafe": true, "janta": false, "almoco": true}, {"dia": "Quarta", "cafe": true, "janta": false, "almoco": false}, {"dia": "Quinta", "cafe": true, "janta": false, "almoco": false}, {"dia": "Sexta", "cafe": true, "janta": false, "almoco": true}, {"dia": "Sábado", "cafe": false, "janta": false, "almoco": false}, {"dia": "Domingo", "cafe": false, "janta": false, "almoco": false}]	[{"fim": "2025-12-22", "obs": "", "modo": "semanal", "tipo": "Férias", "inicio": "2025-12-17", "configuracao": [{"dia": "Segunda", "cafe": false, "janta": true, "almoco": false}, {"dia": "Terça", "cafe": false, "janta": false, "almoco": false}, {"dia": "Quarta", "cafe": true, "janta": true, "almoco": false}, {"dia": "Quinta", "cafe": false, "janta": false, "almoco": true}, {"dia": "Sexta", "cafe": true, "janta": true, "almoco": false}, {"dia": "Sábado", "cafe": false, "janta": false, "almoco": true}, {"dia": "Domingo", "cafe": true, "janta": false, "almoco": false}]}]	[{"fim": "2025-12-27", "obs": "zsasf awarr awrAR", "modo": "individual", "tipo": "Férias", "inicio": "2025-12-25", "configuracao": [{"data": "2025-12-25", "ativo": true, "refeicao": "cafe"}, {"data": "2025-12-25", "ativo": false, "refeicao": "almoco"}, {"data": "2025-12-25", "ativo": false, "refeicao": "janta"}, {"data": "2025-12-26", "ativo": false, "refeicao": "cafe"}, {"data": "2025-12-26", "ativo": true, "refeicao": "almoco"}, {"data": "2025-12-26", "ativo": false, "refeicao": "janta"}, {"data": "2025-12-27", "ativo": false, "refeicao": "cafe"}, {"data": "2025-12-27", "ativo": false, "refeicao": "almoco"}, {"data": "2025-12-27", "ativo": true, "refeicao": "janta"}]}, {"fim": "2026-01-30", "obs": "", "modo": "individual", "tipo": "Férias", "inicio": "2026-01-22", "configuracao": [{"data": "2026-01-22", "ativo": false, "refeicao": "cafe"}, {"data": "2026-01-22", "ativo": false, "refeicao": "almoco"}, {"data": "2026-01-22", "ativo": false, "refeicao": "janta"}, {"data": "2026-01-23", "ativo": false, "refeicao": "cafe"}, {"data": "2026-01-23", "ativo": false, "refeicao": "almoco"}, {"data": "2026-01-23", "ativo": false, "refeicao": "janta"}, {"data": "2026-01-24", "ativo": true, "refeicao": "cafe"}, {"data": "2026-01-24", "ativo": true, "refeicao": "almoco"}, {"data": "2026-01-24", "ativo": true, "refeicao": "janta"}, {"data": "2026-01-25", "ativo": false, "refeicao": "cafe"}, {"data": "2026-01-25", "ativo": true, "refeicao": "almoco"}, {"data": "2026-01-25", "ativo": false, "refeicao": "janta"}, {"data": "2026-01-26", "ativo": false, "refeicao": "cafe"}, {"data": "2026-01-26", "ativo": true, "refeicao": "almoco"}, {"data": "2026-01-26", "ativo": false, "refeicao": "janta"}, {"data": "2026-01-27", "ativo": false, "refeicao": "cafe"}, {"data": "2026-01-27", "ativo": false, "refeicao": "almoco"}, {"data": "2026-01-27", "ativo": false, "refeicao": "janta"}, {"data": "2026-01-28", "ativo": true, "refeicao": "cafe"}, {"data": "2026-01-28", "ativo": false, "refeicao": "almoco"}, {"data": "2026-01-28", "ativo": false, "refeicao": "janta"}, {"data": "2026-01-29", "ativo": false, "refeicao": "cafe"}, {"data": "2026-01-29", "ativo": true, "refeicao": "almoco"}, {"data": "2026-01-29", "ativo": false, "refeicao": "janta"}, {"data": "2026-01-30", "ativo": false, "refeicao": "cafe"}, {"data": "2026-01-30", "ativo": false, "refeicao": "almoco"}, {"data": "2026-01-30", "ativo": false, "refeicao": "janta"}]}]	t
 12	CB MORAES	Henrique Moraes Pacheco	MIL010	00000000010	moraes@exemplo.mil.br	hash123	1	1	{"qua": "AJ", "qui": "AJ", "seg": "AJ", "sex": "AJ", "ter": "AJ"}	\N	\N	t
 3	CB SILVA	Carlos Alberto da Silva	MIL001	00000000001	silva@exemplo.mil.br	hash123	1	10	{"qua": "CAJ", "qui": "CAJ", "seg": "CAJ", "sex": "CAJ", "ter": "CAJ"}	\N	\N	t
 4	SD SOUZA	João Pedro Souza	MIL002	00000000002	souza@exemplo.mil.br	hash123	1	8	{"qua": "CA", "qui": "CA", "seg": "CA", "sex": "CA", "ter": "CA"}	\N	\N	t
@@ -294,6 +293,7 @@ COPY public.usuarios (id, nome_guerra, nome_completo, idt_mil, cpf, email, senha
 9	SD OLIVEIRA	Felipe Oliveira Nunes	MIL007	00000000007	oliveira@exemplo.mil.br	hash123	1	4	{"qua": "CA", "qui": "CA", "seg": "CA", "sex": "CA", "ter": "CA"}	\N	\N	t
 10	CB RIBEIRO	Thiago Ribeiro Melo	MIL008	00000000008	ribeiro@exemplo.mil.br	hash123	1	3	{"qua": "C", "qui": "C", "seg": "C", "sex": "C", "ter": "C"}	\N	\N	t
 11	SD BARROS	Daniel Barros Teixeira	MIL009	00000000009	barros@exemplo.mil.br	hash123	1	2	{"qua": "CAJ", "qui": "CAJ", "seg": "CAJ", "sex": "CAJ", "ter": "CAJ"}	\N	\N	t
+2	BATISTA	Marcos Batista da Silva	EB123456	12345678901	marcos.batista@eb.mil.br	123	1	11	[{"dia": "Segunda", "cafe": false, "janta": false, "almoco": true}, {"dia": "Terça", "cafe": true, "janta": false, "almoco": true}, {"dia": "Quarta", "cafe": true, "janta": false, "almoco": true}, {"dia": "Quinta", "cafe": true, "janta": false, "almoco": true}, {"dia": "Sexta", "cafe": true, "janta": false, "almoco": false}, {"dia": "Sábado", "cafe": false, "janta": false, "almoco": false}, {"dia": "Domingo", "cafe": false, "janta": false, "almoco": false}]	[{"fim": "2025-12-22", "obs": "", "modo": "semanal", "tipo": "Férias", "inicio": "2025-12-17", "configuracao": [{"dia": "Segunda", "cafe": false, "janta": true, "almoco": false}, {"dia": "Terça", "cafe": false, "janta": false, "almoco": false}, {"dia": "Quarta", "cafe": true, "janta": true, "almoco": false}, {"dia": "Quinta", "cafe": false, "janta": false, "almoco": true}, {"dia": "Sexta", "cafe": true, "janta": true, "almoco": false}, {"dia": "Sábado", "cafe": false, "janta": false, "almoco": true}, {"dia": "Domingo", "cafe": true, "janta": false, "almoco": false}]}]	[{"fim": "2026-01-30", "obs": "sssss", "modo": "individual", "tipo": "Férias", "inicio": "2026-01-22", "configuracao": [{"data": "2026-01-22", "ativo": false, "refeicao": "cafe"}, {"data": "2026-01-22", "ativo": false, "refeicao": "almoco"}, {"data": "2026-01-22", "ativo": false, "refeicao": "janta"}, {"data": "2026-01-23", "ativo": false, "refeicao": "cafe"}, {"data": "2026-01-23", "ativo": false, "refeicao": "almoco"}, {"data": "2026-01-23", "ativo": false, "refeicao": "janta"}, {"data": "2026-01-24", "ativo": true, "refeicao": "cafe"}, {"data": "2026-01-24", "ativo": true, "refeicao": "almoco"}, {"data": "2026-01-24", "ativo": true, "refeicao": "janta"}, {"data": "2026-01-25", "ativo": false, "refeicao": "cafe"}, {"data": "2026-01-25", "ativo": true, "refeicao": "almoco"}, {"data": "2026-01-25", "ativo": false, "refeicao": "janta"}, {"data": "2026-01-26", "ativo": false, "refeicao": "cafe"}, {"data": "2026-01-26", "ativo": true, "refeicao": "almoco"}, {"data": "2026-01-26", "ativo": false, "refeicao": "janta"}, {"data": "2026-01-27", "ativo": false, "refeicao": "cafe"}, {"data": "2026-01-27", "ativo": false, "refeicao": "almoco"}, {"data": "2026-01-27", "ativo": false, "refeicao": "janta"}, {"data": "2026-01-28", "ativo": true, "refeicao": "cafe"}, {"data": "2026-01-28", "ativo": false, "refeicao": "almoco"}, {"data": "2026-01-28", "ativo": false, "refeicao": "janta"}, {"data": "2026-01-29", "ativo": false, "refeicao": "cafe"}, {"data": "2026-01-29", "ativo": true, "refeicao": "almoco"}, {"data": "2026-01-29", "ativo": false, "refeicao": "janta"}, {"data": "2026-01-30", "ativo": false, "refeicao": "cafe"}, {"data": "2026-01-30", "ativo": false, "refeicao": "almoco"}, {"data": "2026-01-30", "ativo": false, "refeicao": "janta"}]}]	t
 \.
 
 
@@ -434,7 +434,7 @@ GRANT ALL ON SCHEMA public TO postgres;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
--- Completed on 2025-12-19 18:03:06
+-- Completed on 2025-12-19 21:30:33
 
 --
 -- PostgreSQL database dump complete
