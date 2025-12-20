@@ -1,4 +1,4 @@
 <?php
-  header('Location: php/arranchamento.php');
+  header('Location: page/arranchamento.php');
   exit;
 ?>

@@ -52,6 +52,13 @@ dialog { border:none; border-radius:8px; }
   margin-left: 6px;
 }
 
+tr:not(.simulacao-travada) td.refeicao {
+  cursor: pointer;
+}
+tr:not(.simulacao-travada) td.refeicao:hover {
+  background-color: #fd9090;
+}
+
 .lista-excessoes-td-acao {
   position: relative;
   width: 40px;
@@ -125,6 +132,7 @@ border-left: 5px solid #1e88e5;
 
 .lista-excessoes-td-refeicao {
   min-width: 70px;
+  cursor: pointer;
 }
 
 .layout-arranchamento {

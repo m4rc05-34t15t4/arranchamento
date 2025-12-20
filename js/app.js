@@ -57,11 +57,25 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       gerarDiasIndividuais();
     });
-    
+
+    document.addEventListener('click', function (e) {
+      const td = e.target;
+      if (td.matches('tr:not(.simulacao-travada) td.refeicao')) {
+        td.textContent = td.textContent.includes(check_icone) ? '-' : check_icone;
+      }
+    });
+
+    document.addEventListener('click', function (e) {
+      if (e.target.classList.contains('lista-excessoes-td-refeicao')) {
+        console.log(e.target.textContent);
+      }
+    });
 
 });
 
 /* ================== CONFIGURAÇÃO BÁSICA ================== */
+
+const check_icone = '✔️';
 
 const dias = ['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'];
 const diasSemanaJS = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
@@ -708,22 +722,19 @@ function renderSimulacao() {
     /* ===== LINHA ===== */
     const tr = document.createElement('tr');
 
-    if (temRelatorio || dataLinha < hoje) {
-      tr.classList.add('simulacao-travada');
-    } else if (temIndividual) {
-      tr.classList.add('simulacao-individual');
-    } else if (temSemanal) {
-      tr.classList.add('simulacao-semanal');
-    }
+    if (temRelatorio || dataLinha < hoje) tr.classList.add('simulacao-travada');
+    else if (temIndividual) tr.classList.add('simulacao-individual');
+    else if (temSemanal) tr.classList.add('simulacao-semanal');
+    else tr.classList.add('simulacao-padrao');
 
     tr.innerHTML = `
       <td>
         ${dataISO} ${diaSemana}
         ${temRelatorio ? '<span class="lock">🔒</span>' : ''}
       </td>
-      <td>${base.cafe ? '✔️' : '-'}</td>
-      <td>${base.almoco ? '✔️' : '-'}</td>
-      <td>${base.janta ? '✔️' : '-'}</td>
+      <td class="refeicao">${base.cafe ? '✔️' : '-'}</td>
+      <td class="refeicao">${base.almoco ? '✔️' : '-'}</td>
+      <td class="refeicao">${base.janta ? '✔️' : '-'}</td>
     `;
 
     tbody.appendChild(tr);
