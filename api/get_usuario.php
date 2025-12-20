@@ -56,6 +56,30 @@ if (!$usuario) {
     exit;
 }
 
+//arranchamentos_anteriores
+
+$sql = "
+SELECT id as id_relatorio, data_relatorio, usuarios_refeicoes, data_atualizacao FROM relatorios
+WHERE data_relatorio >= date_trunc('month', CURRENT_DATE) - INTERVAL '1 month'
+AND jsonb_exists(usuarios_refeicoes::jsonb, :id_usuario)
+";
+
+//echo json_encode(['erro' => $sql]);
+
+$stmt = $pdo->prepare($sql);
+$stmt->bindValue(':id_usuario', (string)$id, PDO::PARAM_STR);
+$stmt->execute();
+$registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// 🔄 decodificar JSON
+
+foreach ($registros as &$r) {
+    if (isset($r['usuarios_refeicoes'])) {
+        $r['usuarios_refeicoes'] = json_decode($r['usuarios_refeicoes'], true);
+        $r['usuarios_refeicoes'] = $r['usuarios_refeicoes'][$id];
+    }
+}
+
 echo json_encode([
     'id'              => $usuario['id'],
     'nome'            => $usuario['nome_guerra'],
@@ -67,5 +91,6 @@ echo json_encode([
     'excecoes'        => array_merge(
         json_decode($usuario['excecao_semanal'], true) ?? [],
         json_decode($usuario['excecao_diaria'], true) ?? []
-    )
+    ),
+    'arranchamentos_relatorios' => $registros
 ]);

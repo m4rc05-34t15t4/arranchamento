@@ -42,6 +42,55 @@ dialog { border:none; border-radius:8px; }
   justify-content: space-between;
   align-items: center;
 }
+.simulacao-travada {
+  background: #eee;
+  color: #555;
+  font-weight: bold;
+}
+
+.simulacao-travada .lock {
+  margin-left: 6px;
+}
+
+.lista-excessoes-td-acao {
+  position: relative;
+  width: 40px;
+  border-left: none;
+}
+
+.lista-excessoes-td-periodo{
+  border-right:  none;
+}
+
+.acoes-excecao {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 2px;
+}
+
+.btn-icon.editar {
+  color: #0d6efd;
+}
+
+.btn-icon.excluir {
+  color: #dc3545;
+}
+
+.btn-icon:hover {
+  opacity: 0.75;
+}
+
 /* === EXCEÇÕES (LISTA) === */
 .excecao-semanal {
 border-left: 6px solid #f6c97a; /* laranja claro */

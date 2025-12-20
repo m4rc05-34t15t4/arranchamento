@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <title>Arranchamento Diário</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="../style.css?t=<?= $ts ?>">
+  <link rel="stylesheet" href="../css/style.css?t=<?= $ts ?>">
 </head>
 <body>
 

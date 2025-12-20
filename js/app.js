@@ -3,6 +3,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   //EVENTOS
 
+  document.getElementById('mes-anterior').addEventListener('click', () => {
+    const teste = new Date(mesAtual.getFullYear(), mesAtual.getMonth() - 1, 1);
+
+    if (teste < mesMinimo) return; // ⛔ bloqueia passado
+
+    mesAtual = teste;
+    renderSimulacao();
+  });
+
+  document.getElementById('mes-proximo').addEventListener('click', () => {
+    mesAtual = new Date(mesAtual.getFullYear(), mesAtual.getMonth() + 1, 1);
+    renderSimulacao();
+  });
+
   document.getElementById('btnCancelarExclusao')
   .addEventListener('click', fecharConfirmacaoExclusao);
 
@@ -59,9 +73,10 @@ const listaExcecoes = document.getElementById('lista-excecoes');
 const dialog = document.getElementById('dialogExcecao');
 
 const hoje = new Date();
-const mesMinimo = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+const mesMinimo = new Date(hoje.getFullYear(), hoje.getMonth() - 1, 1);
 
 const excecoes = [];
+const arranchamento_relatorios = [];
 
 // ⚠️ ID do usuário logado (ideal vir da sessão)
 const ID_USUARIO = 2;
@@ -75,6 +90,9 @@ let mesAtual = new Date();
 
 let indiceExclusao = null;
 const dialogConfirmacao = document.getElementById('dialogConfirmacao');
+
+const btnConfirmarExclusao = document.getElementById('btnConfirmarExclusao');
+const btnCancelarExclusao = document.getElementById('btnCancelarExclusao');
 
 
 /* ================== PADRÃO SEMANAL ================== */
@@ -300,6 +318,7 @@ function salvarExcecao() {
 
 function removerExcecao(index) {
   excecoes.splice(index, 1);
+  salvar();
   renderExcecoes();
   renderSimulacao();
 }
@@ -409,18 +428,24 @@ function renderExcecoes() {
     /* ===== AÇÕES ===== */
     const tdAcoes = trMain.querySelector('.lista-excessoes-td-acao');
 
+    const actions = document.createElement('div');
+    actions.className = 'acoes-excecao';
+
     const btnEditar = document.createElement('button');
-    btnEditar.textContent = 'Editar';
-    btnEditar.className = 'primary';
+    btnEditar.innerHTML = '✏️';
+    btnEditar.className = 'btn-icon editar';
+    btnEditar.title = 'Editar exceção';
     btnEditar.onclick = () => editarExcecao(index);
 
     const btnExcluir = document.createElement('button');
-    btnExcluir.textContent = 'Excluir';
-    btnExcluir.className = 'danger';
-    btnExcluir.onclick = () => removerExcecao(index);
+    btnExcluir.innerHTML = '🗑️';
+    btnExcluir.className = 'btn-icon excluir';
+    btnExcluir.title = 'Excluir exceção';
+    btnExcluir.onclick = () => abrirConfirmacaoExclusao(index);
 
-    tdAcoes.appendChild(btnEditar);
-    tdAcoes.appendChild(btnExcluir);
+    actions.appendChild(btnEditar);
+    actions.appendChild(btnExcluir);
+    tdAcoes.appendChild(actions);
 
     listaExcecoes.appendChild(trMain);
 
@@ -456,7 +481,7 @@ function limparDialog() {
 /* ================== USUÁRIO ================== */
 
 function carregarUsuario() {
-  fetch(`api/get_usuario.php?id=${ID_USUARIO}`)
+  fetch(`../api/get_usuario.php?id=${ID_USUARIO}`)
     .then(r => r.json())
     .then(dados => {
 
@@ -470,6 +495,10 @@ function carregarUsuario() {
 
       excecoes.length = 0;
       dados.excecoes.forEach(e => excecoes.push(e));
+      
+      arranchamento_relatorios.length = 0;
+      dados.arranchamentos_relatorios.forEach(e => arranchamento_relatorios.push(e));
+         
       renderExcecoes();
       renderSimulacao();
     })
@@ -501,7 +530,7 @@ function salvar() {
     excecoes: excecoes
   };
 
-  fetch('api/salvar_arranchamento.php', {
+  fetch('../api/salvar_arranchamento.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
@@ -587,19 +616,23 @@ function aplicarExcecaoDiaria(data, base) {
   return { base, aplicada: true };
 }
 
+function refeicoesFromString(str) {
+  return {
+    cafe: str.includes('C'),
+    almoco: str.includes('A'),
+    janta: str.includes('J')
+  };
+}
+
+function getRelatorioDia(dataISO) {
+  return arranchamento_relatorios.find(r => r.data_relatorio === dataISO);
+}
+
 function renderSimulacao() {
   const tbody = document.getElementById('tabela-simulacao');
   const tituloMes = document.getElementById('titulo-mes');
 
   tbody.innerHTML = '';
-
-  const hoje = new Date();
-  hoje.setHours(0, 0, 0, 0);
-
-  // 🔒 não permitir mês passado
-  if (mesAtual < new Date(hoje.getFullYear(), hoje.getMonth(), 1)) {
-    mesAtual = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
-  }
 
   const ano = mesAtual.getFullYear();
   const mes = mesAtual.getMonth();
@@ -611,70 +644,88 @@ function renderSimulacao() {
 
   const inicioMes = new Date(ano, mes, 1);
   const fimMes = new Date(ano, mes + 1, 0);
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
 
-  const inicio =
-    ano === hoje.getFullYear() && mes === hoje.getMonth()
-      ? new Date(hoje)
-      : new Date(inicioMes);
-
-  for (let d = new Date(inicio); d <= fimMes; d.setDate(d.getDate() + 1)) {
-
-    // 🔁 base NOVA por dia (clonada)
-    const padrao = getPadraoDia(d);
-    if (!padrao) continue;
-
-    let base = { ...padrao };
-
-    let temSemanal = false;
-    let temIndividual = false;
+  for (let d = new Date(inicioMes); d <= fimMes; d.setDate(d.getDate() + 1)) {
 
     const dataISO = d.toISOString().split('T')[0];
     const diaSemana = diasSemanaJS[d.getDay()];
+    const dataLinha = new Date(dataISO);
+    dataLinha.setHours(0, 0, 0, 0);
 
-    // 🟠 exceção semanal
-    excecoes.forEach(e => {
-      if (e.modo !== 'semanal') return;
-      if (dataISO < e.inicio || dataISO > e.fim) return;
+    let base;
+    let temSemanal = false;
+    let temIndividual = false;
+    let temRelatorio = false;
 
-      const conf = e.configuracao.find(c => c.dia === diaSemana);
-      if (conf) {
-        base = {
-          cafe: conf.cafe,
-          almoco: conf.almoco,
-          janta: conf.janta
-        };
-        temSemanal = true;
-      }
-    });
+    /* ================================
+       🔒 PRIORIDADE MÁXIMA — RELATÓRIO
+    ================================= */
+    const relatorio = getRelatorioDia(dataISO);
+    if (relatorio) {
+      base = refeicoesFromString(relatorio.usuarios_refeicoes);
+      temRelatorio = true;
+    } else {
 
-    // 🔵 exceção individual (prioridade máxima)
-    excecoes.forEach(e => {
-      if (e.modo !== 'individual') return;
-      if (dataISO < e.inicio || dataISO > e.fim) return;
+      /* ===== PADRÃO ===== */
+      const padrao = getPadraoDia(d);
+      if (!padrao) continue;
+      base = { ...padrao };
 
-      const registros = e.configuracao.filter(r => r.data === dataISO);
-      if (registros.length) {
-        base = { cafe: false, almoco: false, janta: false };
+      /* ===== EXCEÇÃO SEMANAL ===== */
+      excecoes.forEach(e => {
+        if (e.modo !== 'semanal') return;
+        if (dataISO < e.inicio || dataISO > e.fim) return;
 
-        registros.forEach(r => {
-          if (r.ativo) base[r.refeicao] = true;
-        });
+        const conf = e.configuracao.find(c => c.dia === diaSemana);
+        if (conf) {
+          base = {
+            cafe: conf.cafe,
+            almoco: conf.almoco,
+            janta: conf.janta
+          };
+          temSemanal = true;
+        }
+      });
 
-        temIndividual = true;
-      }
-    });
+      /* ===== EXCEÇÃO INDIVIDUAL ===== */
+      excecoes.forEach(e => {
+        if (e.modo !== 'individual') return;
+        if (dataISO < e.inicio || dataISO > e.fim) return;
+
+        const registros = e.configuracao.filter(r => r.data === dataISO);
+        if (registros.length) {
+          base = { cafe: false, almoco: false, janta: false };
+          registros.forEach(r => {
+            if (r.ativo) base[r.refeicao] = true;
+          });
+          temIndividual = true;
+        }
+      });
+    }
+
+    /* ===== LINHA ===== */
     const tr = document.createElement('tr');
-    if (temIndividual) {
+
+    if (temRelatorio || dataLinha < hoje) {
+      tr.classList.add('simulacao-travada');
+    } else if (temIndividual) {
       tr.classList.add('simulacao-individual');
     } else if (temSemanal) {
       tr.classList.add('simulacao-semanal');
     }
+
     tr.innerHTML = `
-      <td>${dataISO} ${diaSemana}</td>
+      <td>
+        ${dataISO} ${diaSemana}
+        ${temRelatorio ? '<span class="lock">🔒</span>' : ''}
+      </td>
       <td>${base.cafe ? '✔️' : '-'}</td>
       <td>${base.almoco ? '✔️' : '-'}</td>
       <td>${base.janta ? '✔️' : '-'}</td>
     `;
+
     tbody.appendChild(tr);
   }
 
@@ -683,23 +734,13 @@ function renderSimulacao() {
 
 function atualizarBotoesMes() {
   const btnAnterior = document.getElementById('mes-anterior');
-  btnAnterior.disabled = mesAtual <= mesMinimo;
+
+  const hoje = new Date();
+  hoje.setDate(1); // primeiro dia do mês atual
+
+  const mesAnterior = new Date(hoje);
+  mesAnterior.setMonth(hoje.getMonth() - 1);
+
+  // 🔒 bloqueia apenas se tentar ir antes do mês anterior
+  btnAnterior.disabled = mesAtual < mesAnterior;
 }
-
-
-//EVENTOS
-
-document.getElementById('mes-anterior').addEventListener('click', () => {
-  const teste = new Date(mesAtual.getFullYear(), mesAtual.getMonth() - 1, 1);
-
-  if (teste < mesMinimo) return; // ⛔ bloqueia passado
-
-  mesAtual = teste;
-  renderSimulacao();
-});
-
-document.getElementById('mes-proximo').addEventListener('click', () => {
-  mesAtual = new Date(mesAtual.getFullYear(), mesAtual.getMonth() + 1, 1);
-  renderSimulacao();
-});
-
