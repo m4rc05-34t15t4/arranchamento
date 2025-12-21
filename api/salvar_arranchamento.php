@@ -41,16 +41,9 @@ if (!$idUsuario || !$padraoSemanal) {
 }
 
 // ================== SEPARAR EXCEÇÕES ==================
-$excecaoSemanal = [];
-$excecaoDiaria  = [];
-
-foreach ($excecoes as $e) {
-    if ($e['modo'] === 'semanal') {
-        $excecaoSemanal[] = $e;
-    } else {
-        $excecaoDiaria[] = $e;
-    }
-}
+$excecaoSemanal = $excecoes['semanal'] ?? [];
+$excecaoDiaria = $excecoes['diaria'] ?? [];
+$excecaoManual = $excecoes['manual'] ?? [];
 
 // ================== UPDATE ==================
 $sql = "
@@ -58,7 +51,8 @@ $sql = "
     SET
         padrao_semanal   = :padrao,
         excecao_semanal  = :excecao_semanal,
-        excecao_diaria   = :excecao_diaria
+        excecao_diaria   = :excecao_diaria,
+        excecao_manual   = :excecao_manual 
     WHERE id = :id
 ";
 
@@ -68,6 +62,7 @@ $stmt->execute([
     ':padrao'           => json_encode($padraoSemanal),
     ':excecao_semanal'  => json_encode($excecaoSemanal),
     ':excecao_diaria'   => json_encode($excecaoDiaria),
+    ':excecao_manual'   => json_encode($excecaoManual),
     ':id'               => $idUsuario
 ]);
 

@@ -5,7 +5,7 @@
 -- Dumped from database version 17.4
 -- Dumped by pg_dump version 17.1
 
--- Started on 2025-12-19 21:30:33
+-- Started on 2025-12-21 19:09:05
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -159,7 +159,8 @@ CREATE TABLE public.usuarios (
     padrao_semanal jsonb,
     excecao_semanal jsonb,
     excecao_diaria jsonb,
-    ativo boolean DEFAULT true
+    ativo boolean DEFAULT true,
+    excecao_manual jsonb
 );
 
 
@@ -282,18 +283,18 @@ COPY public.relatorios (id, data_relatorio, id_om, usuarios_refeicoes, data_atua
 -- Data for Name: usuarios; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.usuarios (id, nome_guerra, nome_completo, idt_mil, cpf, email, senha, id_om, id_patente, padrao_semanal, excecao_semanal, excecao_diaria, ativo) FROM stdin;
-12	CB MORAES	Henrique Moraes Pacheco	MIL010	00000000010	moraes@exemplo.mil.br	hash123	1	1	{"qua": "AJ", "qui": "AJ", "seg": "AJ", "sex": "AJ", "ter": "AJ"}	\N	\N	t
-3	CB SILVA	Carlos Alberto da Silva	MIL001	00000000001	silva@exemplo.mil.br	hash123	1	10	{"qua": "CAJ", "qui": "CAJ", "seg": "CAJ", "sex": "CAJ", "ter": "CAJ"}	\N	\N	t
-4	SD SOUZA	João Pedro Souza	MIL002	00000000002	souza@exemplo.mil.br	hash123	1	8	{"qua": "CA", "qui": "CA", "seg": "CA", "sex": "CA", "ter": "CA"}	\N	\N	t
-5	3º SGT LIMA	Marcos Lima Ferreira	MIL003	00000000003	lima@exemplo.mil.br	hash123	1	8	{"qua": "AJ", "qui": "AJ", "seg": "AJ", "sex": "AJ", "ter": "AJ"}	\N	\N	t
-6	CB ROCHA	André Rocha Santos	MIL004	00000000004	rocha@exemplo.mil.br	hash123	1	7	{"qua": "C", "qui": "C", "seg": "C", "sex": "C", "ter": "C"}	\N	\N	t
-7	SD COSTA	Lucas Costa Almeida	MIL005	00000000005	costa@exemplo.mil.br	hash123	1	6	{"qua": "AJ", "qui": "CAJ", "seg": "CAJ", "sex": "C", "ter": "CA"}	\N	\N	t
-8	CB PEREIRA	Rafael Pereira Lima	MIL006	00000000006	pereira@exemplo.mil.br	hash123	1	5	{"qua": "AJ", "qui": "AJ", "seg": "AJ", "sex": "AJ", "ter": "AJ"}	\N	\N	t
-9	SD OLIVEIRA	Felipe Oliveira Nunes	MIL007	00000000007	oliveira@exemplo.mil.br	hash123	1	4	{"qua": "CA", "qui": "CA", "seg": "CA", "sex": "CA", "ter": "CA"}	\N	\N	t
-10	CB RIBEIRO	Thiago Ribeiro Melo	MIL008	00000000008	ribeiro@exemplo.mil.br	hash123	1	3	{"qua": "C", "qui": "C", "seg": "C", "sex": "C", "ter": "C"}	\N	\N	t
-11	SD BARROS	Daniel Barros Teixeira	MIL009	00000000009	barros@exemplo.mil.br	hash123	1	2	{"qua": "CAJ", "qui": "CAJ", "seg": "CAJ", "sex": "CAJ", "ter": "CAJ"}	\N	\N	t
-2	BATISTA	Marcos Batista da Silva	EB123456	12345678901	marcos.batista@eb.mil.br	123	1	11	[{"dia": "Segunda", "cafe": false, "janta": false, "almoco": true}, {"dia": "Terça", "cafe": true, "janta": false, "almoco": true}, {"dia": "Quarta", "cafe": true, "janta": false, "almoco": true}, {"dia": "Quinta", "cafe": true, "janta": false, "almoco": true}, {"dia": "Sexta", "cafe": true, "janta": false, "almoco": false}, {"dia": "Sábado", "cafe": false, "janta": false, "almoco": false}, {"dia": "Domingo", "cafe": false, "janta": false, "almoco": false}]	[{"fim": "2025-12-22", "obs": "", "modo": "semanal", "tipo": "Férias", "inicio": "2025-12-17", "configuracao": [{"dia": "Segunda", "cafe": false, "janta": true, "almoco": false}, {"dia": "Terça", "cafe": false, "janta": false, "almoco": false}, {"dia": "Quarta", "cafe": true, "janta": true, "almoco": false}, {"dia": "Quinta", "cafe": false, "janta": false, "almoco": true}, {"dia": "Sexta", "cafe": true, "janta": true, "almoco": false}, {"dia": "Sábado", "cafe": false, "janta": false, "almoco": true}, {"dia": "Domingo", "cafe": true, "janta": false, "almoco": false}]}]	[{"fim": "2026-01-30", "obs": "sssss", "modo": "individual", "tipo": "Férias", "inicio": "2026-01-22", "configuracao": [{"data": "2026-01-22", "ativo": false, "refeicao": "cafe"}, {"data": "2026-01-22", "ativo": false, "refeicao": "almoco"}, {"data": "2026-01-22", "ativo": false, "refeicao": "janta"}, {"data": "2026-01-23", "ativo": false, "refeicao": "cafe"}, {"data": "2026-01-23", "ativo": false, "refeicao": "almoco"}, {"data": "2026-01-23", "ativo": false, "refeicao": "janta"}, {"data": "2026-01-24", "ativo": true, "refeicao": "cafe"}, {"data": "2026-01-24", "ativo": true, "refeicao": "almoco"}, {"data": "2026-01-24", "ativo": true, "refeicao": "janta"}, {"data": "2026-01-25", "ativo": false, "refeicao": "cafe"}, {"data": "2026-01-25", "ativo": true, "refeicao": "almoco"}, {"data": "2026-01-25", "ativo": false, "refeicao": "janta"}, {"data": "2026-01-26", "ativo": false, "refeicao": "cafe"}, {"data": "2026-01-26", "ativo": true, "refeicao": "almoco"}, {"data": "2026-01-26", "ativo": false, "refeicao": "janta"}, {"data": "2026-01-27", "ativo": false, "refeicao": "cafe"}, {"data": "2026-01-27", "ativo": false, "refeicao": "almoco"}, {"data": "2026-01-27", "ativo": false, "refeicao": "janta"}, {"data": "2026-01-28", "ativo": true, "refeicao": "cafe"}, {"data": "2026-01-28", "ativo": false, "refeicao": "almoco"}, {"data": "2026-01-28", "ativo": false, "refeicao": "janta"}, {"data": "2026-01-29", "ativo": false, "refeicao": "cafe"}, {"data": "2026-01-29", "ativo": true, "refeicao": "almoco"}, {"data": "2026-01-29", "ativo": false, "refeicao": "janta"}, {"data": "2026-01-30", "ativo": false, "refeicao": "cafe"}, {"data": "2026-01-30", "ativo": false, "refeicao": "almoco"}, {"data": "2026-01-30", "ativo": false, "refeicao": "janta"}]}]	t
+COPY public.usuarios (id, nome_guerra, nome_completo, idt_mil, cpf, email, senha, id_om, id_patente, padrao_semanal, excecao_semanal, excecao_diaria, ativo, excecao_manual) FROM stdin;
+12	CB MORAES	Henrique Moraes Pacheco	MIL010	00000000010	moraes@exemplo.mil.br	hash123	1	1	{"qua": "AJ", "qui": "AJ", "seg": "AJ", "sex": "AJ", "ter": "AJ"}	\N	\N	t	\N
+4	SD SOUZA	João Pedro Souza	MIL002	00000000002	souza@exemplo.mil.br	hash123	1	8	{"qua": "CA", "qui": "CA", "seg": "CA", "sex": "CA", "ter": "CA"}	\N	\N	t	\N
+5	3º SGT LIMA	Marcos Lima Ferreira	MIL003	00000000003	lima@exemplo.mil.br	hash123	1	8	{"qua": "AJ", "qui": "AJ", "seg": "AJ", "sex": "AJ", "ter": "AJ"}	\N	\N	t	\N
+6	CB ROCHA	André Rocha Santos	MIL004	00000000004	rocha@exemplo.mil.br	hash123	1	7	{"qua": "C", "qui": "C", "seg": "C", "sex": "C", "ter": "C"}	\N	\N	t	\N
+7	SD COSTA	Lucas Costa Almeida	MIL005	00000000005	costa@exemplo.mil.br	hash123	1	6	{"qua": "AJ", "qui": "CAJ", "seg": "CAJ", "sex": "C", "ter": "CA"}	\N	\N	t	\N
+8	CB PEREIRA	Rafael Pereira Lima	MIL006	00000000006	pereira@exemplo.mil.br	hash123	1	5	{"qua": "AJ", "qui": "AJ", "seg": "AJ", "sex": "AJ", "ter": "AJ"}	\N	\N	t	\N
+9	SD OLIVEIRA	Felipe Oliveira Nunes	MIL007	00000000007	oliveira@exemplo.mil.br	hash123	1	4	{"qua": "CA", "qui": "CA", "seg": "CA", "sex": "CA", "ter": "CA"}	\N	\N	t	\N
+10	CB RIBEIRO	Thiago Ribeiro Melo	MIL008	00000000008	ribeiro@exemplo.mil.br	hash123	1	3	{"qua": "C", "qui": "C", "seg": "C", "sex": "C", "ter": "C"}	\N	\N	t	\N
+11	SD BARROS	Daniel Barros Teixeira	MIL009	00000000009	barros@exemplo.mil.br	hash123	1	2	{"qua": "CAJ", "qui": "CAJ", "seg": "CAJ", "sex": "CAJ", "ter": "CAJ"}	\N	\N	t	\N
+3	CB SILVA	Carlos Alberto da Silva	MIL001	00000000001	silva@exemplo.mil.br	hash123	1	10	{"qua": "CAJ", "qui": "CAJ", "seg": "CAJ", "sex": "CAJ", "ter": "CAJ"}	[{"fim": "2025-12-22", "obs": "", "modo": "semanal", "tipo": "Férias", "inicio": "2025-12-17", "configuracao": [{"dia": "Segunda", "cafe": false, "janta": true, "almoco": false}, {"dia": "Terça", "cafe": false, "janta": false, "almoco": false}, {"dia": "Quarta", "cafe": true, "janta": true, "almoco": false}, {"dia": "Quinta", "cafe": false, "janta": false, "almoco": true}, {"dia": "Sexta", "cafe": true, "janta": true, "almoco": false}, {"dia": "Sábado", "cafe": false, "janta": false, "almoco": true}, {"dia": "Domingo", "cafe": true, "janta": false, "almoco": false}]}]	\N	t	\N
+2	BATISTA	Marcos Batista da Silva	EB123456	12345678901	marcos.batista@eb.mil.br	123	1	11	{"Sexta": "C", "Quarta": "CA", "Quinta": "CA", "Terça": "CA", "Domingo": "", "Segunda": "CA", "Sábado": ""}	[{"fim": "2025-12-25", "obs": "hhhh", "tipo": "Dispensa", "inicio": "2025-12-21", "configuracao": {"Sexta": "A", "Quarta": "A", "Quinta": "CJ", "Terça": "C", "Domingo": "", "Segunda": "J", "Sábado": ""}}]	[]	t	{"2025-12-23": "CA", "2025-12-26": "J", "2025-12-27": "CA", "2025-12-28": "J"}
 \.
 
 
@@ -434,7 +435,7 @@ GRANT ALL ON SCHEMA public TO postgres;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
--- Completed on 2025-12-19 21:30:33
+-- Completed on 2025-12-21 19:09:05
 
 --
 -- PostgreSQL database dump complete

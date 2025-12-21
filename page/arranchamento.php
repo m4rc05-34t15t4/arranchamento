@@ -9,7 +9,10 @@
 </head>
 <body>
 
-  <?php include 'header.php'; ?>
+  <?php 
+    include_once 'header.php';
+    include_once 'load.php'; 
+  ?>
 
   <div class="layout-arranchamento">
 

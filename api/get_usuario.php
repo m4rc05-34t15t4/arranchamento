@@ -36,6 +36,7 @@ SELECT
     u.padrao_semanal,
     u.excecao_semanal,
     u.excecao_diaria,
+    u.excecao_manual,
     p.nome AS patente,
     o.nome_om,
     o.sigla_om
@@ -87,10 +88,9 @@ echo json_encode([
     'patente'         => $usuario['patente'],
     'om'              => $usuario['nome_om'],
     'sigla_om'        => $usuario['sigla_om'],
-    'padrao_semanal'  => json_decode($usuario['padrao_semanal'], true) ?? [],
-    'excecoes'        => array_merge(
-        json_decode($usuario['excecao_semanal'], true) ?? [],
-        json_decode($usuario['excecao_diaria'], true) ?? []
-    ),
+    'padrao_semanal'  => json_decode($usuario['padrao_semanal'] ?? '[]', true) ?? [],
+    'excecao_semanal' => json_decode($usuario['excecao_semanal'] ?? '[]', true) ?? [],
+    'excecao_diaria'  => json_decode($usuario['excecao_diaria'] ?? '[]', true) ?? [],
+    'excecao_manual'  => json_decode($usuario['excecao_manual'] ?? '[]', true) ?? [],
     'arranchamentos_relatorios' => $registros
 ]);

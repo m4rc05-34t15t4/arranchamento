@@ -58,12 +58,18 @@ document.addEventListener('DOMContentLoaded', () => {
       gerarDiasIndividuais();
     });
 
+    //edicao manual excessao direto na simulação
     document.addEventListener('click', function (e) {
       const td = e.target;
       if (td.matches('tr:not(.simulacao-travada) td.refeicao')) {
+        // alterna o ícone
         td.textContent = td.textContent.includes(check_icone) ? '-' : check_icone;
+        const tr = td.closest('tr');
+        const cajAtual = obterCAJDaLinha(tr);
+        aplicarExcecaoManualDaLinha(tr, cajAtual);
       }
     });
+
 
     document.addEventListener('click', function (e) {
       if (e.target.classList.contains('lista-excessoes-td-refeicao')) {
@@ -89,7 +95,7 @@ const dialog = document.getElementById('dialogExcecao');
 const hoje = new Date();
 const mesMinimo = new Date(hoje.getFullYear(), hoje.getMonth() - 1, 1);
 
-const excecoes = [];
+let excecoes = {"semanal" : [], "diaria" : [], "manual" : {}};
 const arranchamento_relatorios = [];
 
 // ⚠️ ID do usuário logado (ideal vir da sessão)
@@ -100,11 +106,11 @@ const spanPatente = document.getElementById('patente-usuario');
 const spanOM = document.getElementById('om-usuario');
 
 let indiceEdicao = null;
+let excecaoEmEdicao = null;
+let indiceExclusao = null;
 let mesAtual = new Date();
 
-let indiceExclusao = null;
 const dialogConfirmacao = document.getElementById('dialogConfirmacao');
-
 const btnConfirmarExclusao = document.getElementById('btnConfirmarExclusao');
 const btnCancelarExclusao = document.getElementById('btnCancelarExclusao');
 
@@ -142,6 +148,115 @@ dias.forEach((dia, i) => {
   tabelaExcecao.appendChild(tr);
 });
 
+function aplicarExcecaoManualDaLinha(tr, cajAtual) {
+  const dataISO = tr.getAttribute('data');
+  if (!dataISO) return;
+
+  const cajBase = obterCAJBaseDoDia(dataISO);
+  const cajManualAtual = excecoes['manual'][dataISO] ?? null;
+
+  // 🟢 Igual ao base (inclusive '' === '') → remove manual
+  if (cajAtual === cajBase) {
+    if (cajManualAtual !== null) {
+      delete excecoes['manual'][dataISO];
+    }
+  }
+  // 🔴 Diferente do base → cria ou edita manual
+  else {
+    excecoes['manual'][dataISO] = cajAtual;
+  }
+
+  renderSimulacao();
+  renderExcecoes();
+  salvar();
+}
+
+// loading
+
+let loadingTimeout = null;
+
+function iniciarLoading(delay = 2000, texto = 'Salvando...') {
+  const overlay = document.getElementById('loading-overlay');
+  overlay.querySelector('p').textContent = texto;
+
+  // sempre limpa antes
+  clearTimeout(loadingTimeout);
+
+  // agenda o fade-in
+  loadingTimeout = setTimeout(() => {
+    overlay.classList.add('visivel');
+  }, delay);
+}
+
+function finalizarLoading() {
+  const overlay = document.getElementById('loading-overlay');
+
+  clearTimeout(loadingTimeout);
+  overlay.classList.remove('visivel');
+}
+
+
+function getPadraoDia(data) {
+  const diaSemana = diasSemanaJS[data.getDay()];
+  return dias.findIndex(d => d === diaSemana) !== -1
+    ? dias.map((d, i) => ({
+        dia: d,
+        cafe: document.getElementById(`cafe-${i}`).checked,
+        almoco: document.getElementById(`almoco-${i}`).checked,
+        janta: document.getElementById(`janta-${i}`).checked,
+      }))[dias.findIndex(d => d === diaSemana)]
+    : null;
+}
+
+function obterCAJBaseDoDia(dataISO) {
+  const data = new Date(dataISO + 'T00:00:00');
+  const diaSemana = diasSemanaJS[data.getDay()];
+
+  // 1️⃣ PADRÃO SEMANAL
+  let basePadrao = getPadraoDia(data);
+  if (!basePadrao) return null;
+
+  let base = {
+    cafe: basePadrao.cafe,
+    almoco: basePadrao.almoco,
+    janta: basePadrao.janta
+  };
+
+  // 2️⃣ EXCEÇÃO SEMANAL
+  excecoes['semanal'].forEach(e => {
+    if (dataISO < e.inicio || dataISO > e.fim) return;
+    const valor = e.configuracao[diaSemana];
+    if (valor !== undefined) {
+      base = {
+        cafe: valor.includes('C'),
+        almoco: valor.includes('A'),
+        janta: valor.includes('J')
+      };
+    }
+  });
+
+  // 3️⃣ EXCEÇÃO DIÁRIA
+  excecoes['diaria'].forEach(e => {
+    if (dataISO < e.inicio || dataISO > e.fim) return;
+    const valor = e.configuracao[dataISO];
+    if (valor !== undefined) {
+      base = {
+        cafe: valor.includes('C'),
+        almoco: valor.includes('A'),
+        janta: valor.includes('J')
+      };
+    }
+  });
+
+  // transforma em string CAJ
+  let caj = '';
+  if (base.cafe) caj += 'C';
+  if (base.almoco) caj += 'A';
+  if (base.janta) caj += 'J';
+
+  return caj || '';
+}
+
 /* ================== DIALOG ================== */
 
 function abrirDialog() {
@@ -151,7 +266,7 @@ function abrirDialog() {
   const hoje = new Date();
   hoje.setHours(0, 0, 0, 0);
   const fim = new Date(hoje);
-  fim.setDate(fim.getDate() + 7);
+  fim.setDate(fim.getDate() + 6);
   document.getElementById('dataInicio').value =
     hoje.toISOString().split('T')[0];
   document.getElementById('dataFim').value =
@@ -164,19 +279,22 @@ function fecharDialog() {
   dialog.close();
 }
 
-function abrirConfirmacaoExclusao(index) {
+function abrirConfirmacaoExclusao(tipo, index) {
   indiceExclusao = index;
+  excecaoEmEdicao = { tipo, dados: excecoes[tipo][index] };
   dialogConfirmacao.showModal();
 }
 
 function fecharConfirmacaoExclusao() {
   indiceExclusao = null;
+  excecaoEmEdicao = null;
   dialogConfirmacao.close();
 }
 
 function confirmarExclusao() {
-  if (indiceExclusao !== null) {
-    removerExcecao(indiceExclusao);
+  if (indiceExclusao !== null && excecaoEmEdicao != null) {
+    const { tipo: t, dados: e } = excecaoEmEdicao;
+    removerExcecao(t, indiceExclusao);
   }
   fecharConfirmacaoExclusao();
 }
@@ -186,18 +304,10 @@ function confirmarExclusao() {
 
 function toggleModoExcecao() {
   const modo = document.querySelector('input[name="modoExcecao"]:checked').value;
-
-  document.getElementById('modo-semanal').style.display =
-    modo === 'semanal' ? 'block' : 'none';
-
-  document.getElementById('modo-individual').style.display =
-    modo === 'individual' ? 'block' : 'none';
-
-  if (modo === 'individual') {
-    gerarDiasIndividuais();
-  } else {
-    atualizarDiasSemanaExcecao();
-  }
+  document.getElementById('modo-semanal').style.display = modo === 'semanal' ? 'block' : 'none';
+  document.getElementById('modo-individual').style.display = modo === 'individual' ? 'block' : 'none';
+  if (modo === 'individual') gerarDiasIndividuais();
+  else atualizarDiasSemanaExcecao();
 }
 
 /* ================== GERAR DIAS INDIVIDUAIS ================== */
@@ -254,7 +364,7 @@ function atualizarDiasSemanaExcecao() {
 
   const diasValidos = diasSemanaNoIntervalo(inicio, fim);
 
-  dias.forEach((dia, i) => {
+  diasSemanaJS.forEach((dia, i) => {
     const habilitado = diasValidos.has(dia);
 
     ['cafe', 'almoco', 'janta'].forEach(ref => {
@@ -266,7 +376,6 @@ function atualizarDiasSemanaExcecao() {
     });
   });
 }
-
 
 
 /* ================== SALVAR EXCEÇÃO ================== */
@@ -291,34 +400,49 @@ function salvarExcecao() {
     return;
   }
 
-  let configuracao = [];
-
+  let configuracao = {};
   if (modo === 'semanal') {
-    configuracao = dias.map((dia, i) => ({
-      dia,
-      cafe: document.getElementById(`ex-cafe-${i}`).checked,
-      almoco: document.getElementById(`ex-almoco-${i}`).checked,
-      janta: document.getElementById(`ex-janta-${i}`).checked,
-    }));
+    dias.forEach((dia, i) => {
+      let valor = '';
+      if (document.getElementById(`ex-cafe-${i}`).checked)   valor += 'C';
+      if (document.getElementById(`ex-almoco-${i}`).checked) valor += 'A';
+      if (document.getElementById(`ex-janta-${i}`).checked)  valor += 'J';
+      configuracao[dia] = valor;
+    });
   } else {
-    document
-      .querySelectorAll('#tabela-individual input[type=checkbox]')
-      .forEach(cb => {
-        configuracao.push({
-          data: cb.dataset.data,
-          refeicao: cb.dataset.ref,
-          ativo: cb.checked
-        });
-      });
+    document.querySelectorAll('#tabela-individual input[type=checkbox]').forEach(cb => {
+      const data = cb.dataset.data;
+      const ref  = cb.dataset.ref;
+      if (!configuracao[data]) configuracao[data] = '';
+      if (cb.checked) {
+        if (ref === 'cafe')   configuracao[data] += 'C';
+        if (ref === 'almoco') configuracao[data] += 'A';
+        if (ref === 'janta')  configuracao[data] += 'J';
+      }
+    });
   }
 
-  const excecaoFinal = { tipo, obs, inicio, fim, modo, configuracao };
+  const excecaoFinal = { tipo, obs, inicio, fim, configuracao };
 
   if (indiceEdicao !== null) {
-    excecoes[indiceEdicao] = excecaoFinal;
+    // tipo original da exceção
+    const { tipo: t, dados: e } = excecaoEmEdicao;
+    const tipoOriginal = t;
+    const tipoNovo = modo == 'semanal' ? 'semanal' : 'diaria';
+
+    if (tipoOriginal === tipoNovo) {
+      // ✔️ mesmo tipo → só substitui
+      excecoes[tipoNovo][indiceEdicao] = excecaoFinal;
+    } else {
+      // 🔁 mudou o tipo → remove do antigo e adiciona no novo
+      excecoes[tipoOriginal].splice(indiceEdicao, 1);
+      excecoes[tipoNovo].push(excecaoFinal);
+    }
     indiceEdicao = null;
+    excecaoEmEdicao = null;
   } else {
-    excecoes.push(excecaoFinal);
+    const t = modo == "semanal" ? modo : 'diaria';
+    excecoes[t].push(excecaoFinal);
   }
 
   fecharDialog();
@@ -330,16 +454,18 @@ function salvarExcecao() {
 
 /* ================== EXCLUIR / EDITAR ================== */
 
-function removerExcecao(index) {
-  excecoes.splice(index, 1);
+function removerExcecao(tipo, index) {
+  if (tipo == 'manual') delete excecoes['manual'][index];
+  else excecoes[tipo].splice(index, 1);
   salvar();
   renderExcecoes();
   renderSimulacao();
 }
 
-function editarExcecao(index) {
+function editarExcecao(tipo, index) {
   indiceEdicao = index;
-  const e = excecoes[index];
+  const e = excecoes[tipo][index];
+  excecaoEmEdicao = { tipo, dados: e };
 
   abrirDialog();
 
@@ -350,24 +476,32 @@ function editarExcecao(index) {
 
   atualizarDiasSemanaExcecao();
 
-  document.querySelector(`input[value="${e.modo}"]`).checked = true;
+  const t = tipo != 'semanal' ? 'individual' : tipo;
+  document.querySelector(`input[value="${t}"]`).checked = true;
   toggleModoExcecao();
 
-  if (e.modo === 'semanal') {
-    e.configuracao.forEach((d, i) => {
-      document.getElementById(`ex-cafe-${i}`).checked = d.cafe;
-      document.getElementById(`ex-almoco-${i}`).checked = d.almoco;
-      document.getElementById(`ex-janta-${i}`).checked = d.janta;
+  if (tipo === 'semanal') {
+    diasSemanaJS.forEach((dia, i) => {
+      const valor = e.configuracao[dia] || '';
+      document.getElementById(`ex-cafe-${i}`).checked   = valor.includes('C');
+      document.getElementById(`ex-almoco-${i}`).checked = valor.includes('A');
+      document.getElementById(`ex-janta-${i}`).checked  = valor.includes('J');
     });
   } else {
     gerarDiasIndividuais();
-
     setTimeout(() => {
-      e.configuracao.forEach(d => {
-        const cb = document.querySelector(
-          `input[data-data="${d.data}"][data-ref="${d.refeicao}"]`
-        );
-        if (cb) cb.checked = d.ativo;
+      Object.entries(e.configuracao).forEach(([data, valor]) => {
+        if (!valor) return;
+        const refs = [
+          { letra: 'C', ref: 'cafe' },
+          { letra: 'A', ref: 'almoco' },
+          { letra: 'J', ref: 'janta' }
+        ];
+        refs.forEach(r => {
+          if (!valor.includes(r.letra)) return;
+          const cb = document.querySelector(`input[data-data="${data}"][data-ref="${r.ref}"]`);
+          if (cb) cb.checked = true;
+        });
       });
     }, 50);
   }
@@ -376,58 +510,24 @@ function editarExcecao(index) {
 /* ================== RENDER ================== */
 
 function renderExcecoes() {
+
   listaExcecoes.innerHTML = '';
 
   const hoje = new Date().toISOString().slice(0, 10);
 
-  excecoes.forEach((e, index) => {
-
-    // ⛔ não renderiza exceções encerradas no passado
+  /* ==================================================
+     🟡 1. EXCEÇÕES SEMANAIS
+  ================================================== */
+  excecoes['semanal'].forEach((e, index) => {
     if (e.fim < hoje) return;
-
-    let resumo = '';
-
-    /* ===== RESUMO DAS REFEIÇÕES ===== */
-    if (e.modo === 'semanal') {
-      resumo = e.configuracao
-        .filter(d => d.cafe || d.almoco || d.janta)
-        .map(d =>
-          `${d.dia.toUpperCase().slice(0, 3)}: ` +
-          `${d.cafe ? 'C ' : ''}${d.almoco ? 'A ' : ''}${d.janta ? 'J' : ''}`.trim()
-        )
-        .join('<br>');
-    } else {
-      // 🔵 individual agrupado por data
-      const mapa = {};
-
-      e.configuracao
-        .filter(d => d.ativo)
-        .forEach(d => {
-          if (!mapa[d.data]) {
-            mapa[d.data] = { cafe: false, almoco: false, janta: false };
-          }
-          mapa[d.data][d.refeicao] = true;
-        });
-
-      resumo = Object.entries(mapa)
-        .map(([data, r]) =>
-          `${data}: ${r.cafe ? 'C ' : ''}${r.almoco ? 'A ' : ''}${r.janta ? 'J' : ''}`.trim()
-        )
-        .join('<br>');
-    }
-
     const temObs = e.obs && e.obs.trim() !== '';
-
-    /* ===== CLASSE DE COR ===== */
-    const classeLinha =
-      e.modo === 'individual'
-        ? 'simulacao-individual'
-        : 'simulacao-semanal';
-
+    /* ===== RESUMO DAS REFEIÇÕES ===== */
+    const resumo = Object.entries(e.configuracao).map(([dia, valor]) => `${dia.toUpperCase().slice(0, 3)}: ${valor}` ).join('<br>');
     /* ===== LINHA PRINCIPAL ===== */
     const trMain = document.createElement('tr');
-    trMain.classList.add(classeLinha);
-
+    trMain.className = 'simulacao-semanal';
+    // ⬇️ atributo customizado
+    trMain.setAttribute('excecao', JSON.stringify(e));
     trMain.innerHTML = `
       <td class="lista-excessoes-td-refeicao" rowspan="${temObs ? 2 : 1}">
         ${resumo || '-'}
@@ -438,7 +538,68 @@ function renderExcecoes() {
       </td>
       <td class="lista-excessoes-td-acao"></td>
     `;
+    /* ===== AÇÕES ===== */
+    const tdAcoes = trMain.querySelector('.lista-excessoes-td-acao');
+    const actions = document.createElement('div');
+    actions.className = 'acoes-excecao';
 
+    const btnEditar = document.createElement('button');
+    btnEditar.innerHTML = '✏️';
+    btnEditar.className = 'btn-icon editar';
+    btnEditar.title = 'Editar exceção';
+    btnEditar.onclick = () => editarExcecao('semanal', index);
+
+    const btnExcluir = document.createElement('button');
+    btnExcluir.innerHTML = '🗑️';
+    btnExcluir.className = 'btn-icon excluir';
+    btnExcluir.title = 'Excluir exceção';
+    btnExcluir.onclick = () => abrirConfirmacaoExclusao('semanal', index);
+
+    actions.appendChild(btnEditar);
+    actions.appendChild(btnExcluir);
+    tdAcoes.appendChild(actions);
+    listaExcecoes.appendChild(trMain);
+    /* ===== LINHA DE OBSERVAÇÃO ===== */
+    if (temObs) {
+      const trObs = document.createElement('tr');
+      trObs.className = 'linha-obs simulacao-semanal';
+      trObs.innerHTML = `
+        <td colspan="3" class="lista-excessoes-td-observacao">
+          ${e.obs}
+        </td>
+      `;
+      listaExcecoes.appendChild(trObs);
+    }
+  });
+
+  /* ==================================================
+     🟠 2. EXCEÇÕES DIÁRIAS
+  ================================================== */
+  excecoes['diaria'].forEach((e, index) => {
+  if (e.fim < hoje) return;
+    const temObs = e.obs && e.obs.trim() !== '';
+    /* ===== RESUMO DAS REFEIÇÕES (DIÁRIA) ===== */
+    const resumo = Object.entries(e.configuracao)
+      .map(([data, valor]) => {
+        const [ano, mes, dia] = data.split('-');
+        return `${dia}/${mes}/${ano}: ${valor}`;
+      })
+      .join('<br>');
+    /* ===== LINHA PRINCIPAL ===== */
+    const trMain = document.createElement('tr');
+    trMain.className = 'simulacao-individual';
+    // ⬇️ atributo customizado
+    trMain.setAttribute('excecao', JSON.stringify(e));
+    trMain.innerHTML = `
+      <td class="lista-excessoes-td-refeicao" rowspan="${temObs ? 2 : 1}">
+        ${resumo || '-'}
+      </td>
+      <td class="lista-excessoes-td-tipo">${e.tipo}</td>
+      <td class="lista-excessoes-td-periodo">
+        ${e.inicio}<br>${e.fim}
+      </td>
+      <td class="lista-excessoes-td-acao"></td>
+    `;
     /* ===== AÇÕES ===== */
     const tdAcoes = trMain.querySelector('.lista-excessoes-td-acao');
 
@@ -449,24 +610,22 @@ function renderExcecoes() {
     btnEditar.innerHTML = '✏️';
     btnEditar.className = 'btn-icon editar';
     btnEditar.title = 'Editar exceção';
-    btnEditar.onclick = () => editarExcecao(index);
+    btnEditar.onclick = () => editarExcecao('diaria', index);
 
     const btnExcluir = document.createElement('button');
     btnExcluir.innerHTML = '🗑️';
     btnExcluir.className = 'btn-icon excluir';
     btnExcluir.title = 'Excluir exceção';
-    btnExcluir.onclick = () => abrirConfirmacaoExclusao(index);
+    btnExcluir.onclick = () => abrirConfirmacaoExclusao('diaria', index);
 
     actions.appendChild(btnEditar);
     actions.appendChild(btnExcluir);
     tdAcoes.appendChild(actions);
-
     listaExcecoes.appendChild(trMain);
-
     /* ===== LINHA DE OBSERVAÇÃO ===== */
     if (temObs) {
       const trObs = document.createElement('tr');
-      trObs.className = `linha-obs ${classeLinha}`;
+      trObs.className = 'linha-obs simulacao-individual';
       trObs.innerHTML = `
         <td colspan="3" class="lista-excessoes-td-observacao">
           ${e.obs}
@@ -475,6 +634,29 @@ function renderExcecoes() {
       listaExcecoes.appendChild(trObs);
     }
   });
+
+  /* ==================================================
+     🔴 3. EXCEÇÕES MANUAIS — POR ÚLTIMO
+  ================================================== */
+  Object.entries(excecoes['manual']).forEach(([data, valor]) => {
+  if (data < hoje) return;
+    const tr = document.createElement('tr');
+    tr.className = 'simulacao-manual';
+    // ⬇️ atributo customizado, sem mudar estrutura
+    tr.setAttribute('excecao', `{"${data}" : "${valor}"}`);
+    tr.innerHTML = `
+      <td class="lista-excessoes-td-refeicao">${data} : ${valor}</td>
+      <td class="lista-excessoes-td-tipo">Manual</td>
+      <td class="lista-excessoes-td-periodo">${data}</td>
+      <td class="lista-excessoes-td-acao">
+        <button class="btn-icon excluir">🗑️</button>
+      </td>
+    `;
+
+    tr.querySelector('.excluir').onclick = () => abrirConfirmacaoExclusao('manual', data);
+    listaExcecoes.appendChild(tr);
+  });
+
 }
 
 /* ================== LIMPAR DIALOG ================== */
@@ -507,8 +689,9 @@ function carregarUsuario() {
 
       carregarPadraoSemanal(dados.padrao_semanal);
 
-      excecoes.length = 0;
-      dados.excecoes.forEach(e => excecoes.push(e));
+      excecoes["semanal"] = Array.isArray(dados.excecao_semanal) ? dados.excecao_semanal : [];
+      excecoes["diaria"] = Array.isArray(dados.excecao_diaria) ? dados.excecao_diaria : [];
+      excecoes["manual"] = dados.excecao_manual && !Array.isArray(dados.excecao_manual) ? dados.excecao_manual : {};
       
       arranchamento_relatorios.length = 0;
       dados.arranchamentos_relatorios.forEach(e => arranchamento_relatorios.push(e));
@@ -520,10 +703,11 @@ function carregarUsuario() {
 }
 
 function carregarPadraoSemanal(padrao) {
-  padrao.forEach((dia, i) => {
-    document.getElementById(`cafe-${i}`).checked = dia.cafe;
-    document.getElementById(`almoco-${i}`).checked = dia.almoco;
-    document.getElementById(`janta-${i}`).checked = dia.janta;
+  dias.forEach((dia, i) => {
+    const valor = padrao[dia] || '';
+    document.getElementById(`cafe-${i}`).checked   = valor.includes('C');
+    document.getElementById(`almoco-${i}`).checked = valor.includes('A');
+    document.getElementById(`janta-${i}`).checked  = valor.includes('J');
   });
 }
 
@@ -531,12 +715,20 @@ function carregarPadraoSemanal(padrao) {
 /* ================== SALVAR ARRANCHAMENTO ================== */
 
 function salvar() {
-  const padraoSemanal = dias.map((dia, i) => ({
-    dia,
-    cafe: document.getElementById(`cafe-${i}`).checked,
-    almoco: document.getElementById(`almoco-${i}`).checked,
-    janta: document.getElementById(`janta-${i}`).checked,
-  }));
+
+  // agenda o loading para daqui 2s
+  iniciarLoading(2000, 'Salvando arranchamento...');
+
+  const padraoSemanal = dias.reduce((acc, dia, i) => {
+    let valor = '';
+
+    if (document.getElementById(`cafe-${i}`).checked) valor += 'C';
+    if (document.getElementById(`almoco-${i}`).checked) valor += 'A';
+    if (document.getElementById(`janta-${i}`).checked) valor += 'J';
+
+    acc[dia] = valor; // pode ser '' se nenhum marcado
+    return acc;
+  }, {});
 
   const payload = {
     id_usuario: ID_USUARIO,
@@ -549,8 +741,10 @@ function salvar() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
   })
+  //.then(res => new Promise(resolve => { setTimeout(() => resolve(res), 2000); }))
   .then(r => r.json())
   .then(res => {
+    //console.log('res', res);
     if (res.status === 'ok') {
       console.log(new Date().toLocaleString('pt-BR'), 'Arranchamento salvo com sucesso!');
       //alert('Arranchamento salvo com sucesso!');
@@ -561,6 +755,9 @@ function salvar() {
   .catch(err => {
     console.error(err);
     alert('Erro de comunicação com o servidor');
+  })
+  .finally(() => {
+    finalizarLoading();
   });
 }
 
@@ -568,18 +765,6 @@ function salvar() {
 
 function toISODate(date) {
   return date.toISOString().split('T')[0];
-}
-
-function getPadraoDia(data) {
-  const diaSemana = diasSemanaJS[data.getDay()];
-  return dias.findIndex(d => d === diaSemana) !== -1
-    ? dias.map((d, i) => ({
-        dia: d,
-        cafe: document.getElementById(`cafe-${i}`).checked,
-        almoco: document.getElementById(`almoco-${i}`).checked,
-        janta: document.getElementById(`janta-${i}`).checked,
-      }))[dias.findIndex(d => d === diaSemana)]
-    : null;
 }
 
 function aplicarExcecaoSemanal(data, base) {
@@ -642,6 +827,36 @@ function getRelatorioDia(dataISO) {
   return arranchamento_relatorios.find(r => r.data_relatorio === dataISO);
 }
 
+function getDiaSemanaPtBr(dataISO) {
+  const diasSemana = [
+    'Domingo',
+    'Segunda',
+    'Terça',
+    'Quarta',
+    'Quinta',
+    'Sexta',
+    'Sábado'
+  ];
+
+  const [ano, mes, dia] = dataISO.split('-');
+  const data = new Date(ano, mes - 1, dia); // evita bug de timezone
+
+  return diasSemana[data.getDay()];
+}
+
+function obterCAJDaLinha(tr) {
+  const letras = ['C', 'A', 'J'];
+  let resultado = '';
+
+  tr.querySelectorAll('td.refeicao').forEach((td, i) => {
+    if (td.textContent.trim() === '✔️') {
+      resultado += letras[i];
+    }
+  });
+
+  return resultado || '';
+}
+
 function renderSimulacao() {
   const tbody = document.getElementById('tabela-simulacao');
   const tituloMes = document.getElementById('titulo-mes');
@@ -671,10 +886,11 @@ function renderSimulacao() {
     let base;
     let temSemanal = false;
     let temIndividual = false;
+    let temManual = false;
     let temRelatorio = false;
 
     /* ================================
-       🔒 PRIORIDADE MÁXIMA — RELATÓRIO
+       🔒 PRIORIDADE 1 — RELATÓRIO
     ================================= */
     const relatorio = getRelatorioDia(dataISO);
     if (relatorio) {
@@ -682,47 +898,64 @@ function renderSimulacao() {
       temRelatorio = true;
     } else {
 
-      /* ===== PADRÃO ===== */
+      /* ================================
+         ⚪ PADRÃO
+      ================================= */
       const padrao = getPadraoDia(d);
       if (!padrao) continue;
       base = { ...padrao };
 
-      /* ===== EXCEÇÃO SEMANAL ===== */
-      excecoes.forEach(e => {
-        if (e.modo !== 'semanal') return;
+      /* ================================
+         🟡 EXCEÇÃO SEMANAL
+      ================================= */
+      excecoes['semanal'].forEach(e => {
         if (dataISO < e.inicio || dataISO > e.fim) return;
-
-        const conf = e.configuracao.find(c => c.dia === diaSemana);
-        if (conf) {
+        const diaSemanaAtual = getDiaSemanaPtBr(dataISO);
+        const valor = e.configuracao[diaSemanaAtual];
+        base = { cafe: false, almoco: false, janta: false };
+        if (valor !== undefined) {
           base = {
-            cafe: conf.cafe,
-            almoco: conf.almoco,
-            janta: conf.janta
+            cafe: valor.includes('C'),
+            almoco: valor.includes('A'),
+            janta: valor.includes('J')
           };
-          temSemanal = true;
         }
+        temSemanal = true;
       });
 
-      /* ===== EXCEÇÃO INDIVIDUAL ===== */
-      excecoes.forEach(e => {
-        if (e.modo !== 'individual') return;
+      /* ================================
+         🟠 EXCEÇÃO DIÁRIA
+      ================================= */
+      excecoes['diaria'].forEach(e => {
         if (dataISO < e.inicio || dataISO > e.fim) return;
-
-        const registros = e.configuracao.filter(r => r.data === dataISO);
-        if (registros.length) {
-          base = { cafe: false, almoco: false, janta: false };
-          registros.forEach(r => {
-            if (r.ativo) base[r.refeicao] = true;
-          });
-          temIndividual = true;
+        const valor = e.configuracao[dataISO];
+        base = { cafe: false, almoco: false, janta: false };
+        if (valor !== undefined) {
+          base = {
+            cafe: valor.includes('C'),
+            almoco: valor.includes('A'),
+            janta: valor.includes('J')
+          };
         }
+        temIndividual = true;
       });
+
+      /* ================================
+         🔴 EXCEÇÃO MANUAL — POR ÚLTIMO
+      ================================= */
+      if (excecoes['manual'][dataISO] || excecoes['manual'][dataISO] == '') {
+        base = refeicoesFromString(excecoes['manual'][dataISO]);
+        temManual = true;
+      }
     }
 
-    /* ===== LINHA ===== */
+    /* ================================
+       🎨 CLASSE DA LINHA
+    ================================= */
     const tr = document.createElement('tr');
 
     if (temRelatorio || dataLinha < hoje) tr.classList.add('simulacao-travada');
+    else if (temManual) tr.classList.add('simulacao-manual');
     else if (temIndividual) tr.classList.add('simulacao-individual');
     else if (temSemanal) tr.classList.add('simulacao-semanal');
     else tr.classList.add('simulacao-padrao');
@@ -736,6 +969,11 @@ function renderSimulacao() {
       <td class="refeicao">${base.almoco ? '✔️' : '-'}</td>
       <td class="refeicao">${base.janta ? '✔️' : '-'}</td>
     `;
+
+    const caj = (base.cafe   ? 'C' : '') + (base.almoco ? 'A' : '') + (base.janta  ? 'J' : '');
+    tr.setAttribute('refeicao', caj);
+    tr.setAttribute('dia', diaSemana);
+    tr.setAttribute('data', dataISO);
 
     tbody.appendChild(tr);
   }
@@ -755,3 +993,4 @@ function atualizarBotoesMes() {
   // 🔒 bloqueia apenas se tentar ir antes do mês anterior
   btnAnterior.disabled = mesAtual < mesAnterior;
 }
+

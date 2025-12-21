@@ -114,6 +114,10 @@ border-left: 5px solid #fb8c00;
 background-color: #e3f2fd; /* azul claro */
 border-left: 5px solid #1e88e5;
 }
+.simulacao-manual {
+background-color: #fde3e3; /* azul claro */
+border-left: 5px solid #e51e1e;
+}
 #modo-semanal thead {
   background-color: #fff3e0;       /* mesmo fundo do simulacao-semanal */
   border-top: 4px solid #fb8c00;
@@ -252,6 +256,47 @@ border-left: 5px solid #1e88e5;
 
 .resumo-card h4 {
   margin-top: 0;
+}
+
+/* loading */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.loading-overlay.visivel {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.loading-box {
+  background: #fff;
+  padding: 15px 15px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,.3);
+}
+
+.loading-box img {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 5px;
+}
+
+.loading-box p {
+  margin: 0;
+  font-weight: 500;
 }
 
 /* Mobile */
