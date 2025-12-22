@@ -299,6 +299,28 @@ border-left: 5px solid #e51e1e;
   font-weight: 500;
 }
 
+.tr-highlight {
+  outline: 5px solid #00ff00;
+  outline-offset: -5px;
+  animation: fadeBorder 1.0s ease-in-out forwards;
+}
+
+@keyframes fadeBorder {
+  0% {
+    outline-color: rgba(255, 152, 0, 0);
+  }
+  20% {
+    outline-color: rgb(115, 255, 0, 0.5);
+  }
+  80% {
+    outline-color: rgba(115, 255, 0, 0.8);
+  }
+  100% {
+    outline-color: rgba(255, 152, 0, 0);
+  }
+}
+
+
 /* Mobile */
 @media (max-width: 900px) {
   .layout-arranchamento {

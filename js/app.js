@@ -70,11 +70,23 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-
     document.addEventListener('click', function (e) {
-      if (e.target.classList.contains('lista-excessoes-td-refeicao')) {
-        console.log(e.target.textContent);
+      //if (e.target.classList.contains('lista-excessoes-td-refeicao')) console.log(e.target.textContent);
+      const el = e.target.closest('.lista-excessoes-td-refeicao');
+      if (!el) return;
+      const tr = el.closest('tr');
+      if (!tr) return;
+      const dataInicial = tr.getAttribute('data_inicial');
+      const anoMes_ref = dataInicial.slice(0, 7);
+      const primeiraTr = document.querySelector('#tabela-simulacao tr');
+      if (primeiraTr) {
+        const data = primeiraTr.getAttribute('data');
+        const anoMes_simulacao = data.slice(0, 7);
+        if(anoMes_simulacao != anoMes_ref){
+          renderSimulacao(new Date(dataInicial));
+        }
       }
+      scrollParaData(dataInicial);
     });
 
 });
@@ -195,6 +207,23 @@ function finalizarLoading() {
   overlay.classList.remove('visivel');
 }
 
+function scrollParaData(data) {
+  const tr = document.querySelector(`#tabela-simulacao tr[data="${data}"]`);
+  if (!tr) return;
+  tr.scrollIntoView({
+    behavior: 'smooth',
+    block: 'center'
+  });
+
+  // força reinício da animação se clicar várias vezes
+  tr.classList.remove('tr-highlight');
+  void tr.offsetWidth; // reflow
+  tr.classList.add('tr-highlight');
+  // remove a classe no final (opcional)
+  setTimeout(() => {
+    tr.classList.remove('tr-highlight');
+  }, 1500);
+}
 
 function getPadraoDia(data) {
   const diaSemana = diasSemanaJS[data.getDay()];
@@ -528,6 +557,7 @@ function renderExcecoes() {
     trMain.className = 'simulacao-semanal';
     // ⬇️ atributo customizado
     trMain.setAttribute('excecao', JSON.stringify(e));
+    trMain.setAttribute('data_inicial', e.inicio);
     trMain.innerHTML = `
       <td class="lista-excessoes-td-refeicao" rowspan="${temObs ? 2 : 1}">
         ${resumo || '-'}
@@ -590,6 +620,7 @@ function renderExcecoes() {
     trMain.className = 'simulacao-individual';
     // ⬇️ atributo customizado
     trMain.setAttribute('excecao', JSON.stringify(e));
+    trMain.setAttribute('data_inicial', e.inicio);
     trMain.innerHTML = `
       <td class="lista-excessoes-td-refeicao" rowspan="${temObs ? 2 : 1}">
         ${resumo || '-'}
@@ -644,6 +675,7 @@ function renderExcecoes() {
     tr.className = 'simulacao-manual';
     // ⬇️ atributo customizado, sem mudar estrutura
     tr.setAttribute('excecao', `{"${data}" : "${valor}"}`);
+    tr.setAttribute('data_inicial', data);
     tr.innerHTML = `
       <td class="lista-excessoes-td-refeicao">${data} : ${valor}</td>
       <td class="lista-excessoes-td-tipo">Manual</td>
@@ -746,11 +778,9 @@ function salvar() {
   .then(res => {
     //console.log('res', res);
     if (res.status === 'ok') {
-      console.log(new Date().toLocaleString('pt-BR'), 'Arranchamento salvo com sucesso!');
+      //console.log(new Date().toLocaleString('pt-BR'), 'Arranchamento salvo com sucesso!');
       //alert('Arranchamento salvo com sucesso!');
-    } else {
-      alert(res.erro || 'Erro ao salvar');
-    }
+    } else alert(res.erro || 'Erro ao salvar');
   })
   .catch(err => {
     console.error(err);
@@ -857,16 +887,18 @@ function obterCAJDaLinha(tr) {
   return resultado || '';
 }
 
-function renderSimulacao() {
+function renderSimulacao(data_ref="") {
   const tbody = document.getElementById('tabela-simulacao');
   const tituloMes = document.getElementById('titulo-mes');
 
   tbody.innerHTML = '';
 
-  const ano = mesAtual.getFullYear();
-  const mes = mesAtual.getMonth();
+  if(data_ref == "") data_ref = mesAtual;
 
-  tituloMes.textContent = mesAtual.toLocaleDateString('pt-BR', {
+  const ano = data_ref.getFullYear();
+  const mes = data_ref.getMonth();
+
+  tituloMes.textContent = data_ref.toLocaleDateString('pt-BR', {
     month: 'long',
     year: 'numeric'
   });
