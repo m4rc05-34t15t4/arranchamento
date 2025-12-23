@@ -17,6 +17,7 @@
 
     <div>
       <h2>Arranchamento – <span id="data-atual"></span></h2>
+      <h5 id="data-atualizacao"></h5>
     </div>
 
     <div class="tabelas-duplas resumo-card">
@@ -28,7 +29,7 @@
           <th>Café</th>
           <th>Almoço</th>
           <th>Janta</th>
-          <th class="tabela-espacamento"></th>
+          <th></th>
           <th>Nome</th>
           <th>Café</th>
           <th>Almoço</th>
@@ -61,9 +62,9 @@
             <thead>
               <tr>
                 <th>Posto</th>
-                <th>C</th>
-                <th>A</th>
-                <th>J</th>
+                <th>Café</th>
+                <th>Almoço</th>
+                <th>Janta</th>
               </tr>
             </thead>
             <tbody id="resumo-por-posto"></tbody>

@@ -1,130 +1,41 @@
 document.addEventListener('DOMContentLoaded', function() {
-  carregarArranchamento();
-});
 
+  carregarArranchamento();
+
+});
 
 let relatorios = null;
 let usuarios = null;
 
+function initPatente(patente, totais) {
+  if (!totais.t_patente[patente]) {
+    totais.t_patente[patente] = { t_c: 0, t_a: 0, t_j: 0 };
+  }
+}
 
-function extrairPatente(nomeCompleto) {
-  const patentes = [
-    'Cap',
-    '1º Ten',
-    '2º Ten',
-    '1º Sgt',
-    '2º Sgt',
-    '3º Sgt',
-    'Sd'
-  ];
+function processaUsuario(usuario, usuario_refeicoes, totais) {
+  if (!usuario) return;
 
-  for (const p of patentes) {
-    if (nomeCompleto.startsWith(p)) {
-      return p;
+  const refeicoes = usuario_refeicoes[usuario.id] || '';
+  const mapa = { C: 't_c', A: 't_a', J: 't_j' };
+
+  initPatente(usuario.patente, totais);
+
+  for (const letra in mapa) {
+    if (refeicoes.includes(letra)) {
+      const key = mapa[letra];
+      totais[key]++;
+      totais.t_patente[usuario.patente][key]++;
     }
   }
-
-  return 'Não informado';
 }
 
-function limparNome(nomeCompleto, patente) {
-  return nomeCompleto.replace(patente, '').trim();
+function texto_table_dupla(uEsq, uEsq_r){
+  return `<td>${uEsq ? `${uEsq.patente} ${uEsq.nome_guerra}` : ''}</td>
+      <td>${uEsq_r[0] ? '✔️' : '-'}</td>
+      <td>${uEsq_r[1] ? '✔️' : '-'}</td>
+      <td>${uEsq_r[2] ? '✔️' : '-'}</td>`;
 }
-
-usuarios = [
-  {
-    nomeCompleto: 'Cap BUARQUE',
-    om: '3º CGEO',
-    padrao: { cafe: true, almoco: true, janta: false }
-  },
-  {
-    nomeCompleto: '1º Ten AZEVEDO',
-    om: '3º CGEO',
-    padrao: { cafe: true, almoco: true, janta: true }
-  },
-  {
-    nomeCompleto: '2º Sgt MARCOS BATISTA',
-    om: '3º CGEO',
-    padrao: { cafe: true, almoco: true, janta: true },
-    excecao: { almoco: true }
-  },
-  {
-    nomeCompleto: 'Sd EV Plantão 1',
-    om: '3º CGEO',
-    padrao: { cafe: true, almoco: true, janta: true }
-  },
-  {
-    nomeCompleto: 'Sd EV Cozinheiro',
-    om: '3º CGEO',
-    padrao: { cafe: true, almoco: true, janta: true },
-    excecao: { cafe: true, almoco: true }
-  },
-  {
-      nomeCompleto: 'Cap BUARQUE',
-      om: '3º CGEO',
-      padrao: { cafe: true, almoco: true, janta: false }
-    },
-    {
-      nomeCompleto: '1º Ten AZEVEDO',
-      om: '3º CGEO',
-      padrao: { cafe: true, almoco: true, janta: true }
-    },
-    {
-      nomeCompleto: '2º Sgt MARCOS BATISTA',
-      om: '3º CGEO',
-      padrao: { cafe: true, almoco: true, janta: true },
-      excecao: { almoco: true }
-    },
-    {
-      nomeCompleto: 'Sd EV Plantão 1',
-      om: '3º CGEO',
-      padrao: { cafe: true, almoco: true, janta: true }
-    },
-    {
-      nomeCompleto: 'Sd EV Cozinheiro',
-      om: '3º CGEO',
-      padrao: { cafe: true, almoco: true, janta: true },
-      excecao: { cafe: true, almoco: true }
-    },
-    {
-      nomeCompleto: 'Cap BUARQUE',
-      om: '3º CGEO',
-      padrao: { cafe: true, almoco: true, janta: false }
-    },
-    {
-      nomeCompleto: '1º Ten AZEVEDO',
-      om: '3º CGEO',
-      padrao: { cafe: true, almoco: true, janta: true }
-    },
-    {
-      nomeCompleto: '2º Sgt MARCOS BATISTA',
-      om: '3º CGEO',
-      padrao: { cafe: true, almoco: true, janta: true },
-      excecao: { almoco: true }
-    },
-    {
-      nomeCompleto: 'Sd EV Plantão 1',
-      om: '3º CGEO',
-      padrao: { cafe: true, almoco: true, janta: true }
-    },
-    {
-      nomeCompleto: 'Sd EV Cozinheiro',
-      om: '3º CGEO',
-      padrao: { cafe: true, almoco: true, janta: true },
-      excecao: { cafe: true, almoco: true }
-    }
-].map(u => {
-  const patente = extrairPatente(u.nomeCompleto);
-
-  return {
-    ...u,
-    patente,
-    nome: limparNome(u.nomeCompleto, patente)
-  };
-});
-
-console.log('dados simlados:', usuarios);
- 
   
 function renderArranchamentoDia() {
   const tbody = document.getElementById('tabela-dia-body');
@@ -133,7 +44,11 @@ function renderArranchamentoDia() {
   tbody.innerHTML = '';
 
   // Atualiza data atual
-  const dataArranchamento = new Date();
+  let dataArranchamento = new Date();
+  if(relatorios['data_relatorio']){
+    dataArranchamento = new Date(relatorios['data_relatorio']);
+    document.getElementById('data-atualizacao').textContent = `Atualizado em: ${new Date(relatorios['data_atualizacao']).toLocaleDateString('pt-BR')}`;
+  }  
   document.getElementById('data-atual').textContent =
     dataArranchamento.toLocaleDateString('pt-BR', {
       weekday: 'long',
@@ -144,132 +59,77 @@ function renderArranchamentoDia() {
 
   // Converte string JSON em objeto
   const usuario_refeicoes = JSON.parse(relatorios["usuarios_refeicoes"]);
+  const totais = {
+    t_c: 0,
+    t_a: 0,
+    t_j: 0,
+    t_patente: {}
+  };
+  let ordem_patentes_arr = [];
 
   // Percorre usuários em pares (esquerda/direita)
   for (let i = 0; i < usuarios.length; i += 2) {
     const uEsq = usuarios[i];
     const uDir = usuarios[i + 1];
+    const uEsq_r = [uEsq && usuario_refeicoes[uEsq.id]?.includes('C'), uEsq && usuario_refeicoes[uEsq.id]?.includes('A'), uEsq && usuario_refeicoes[uEsq.id]?.includes('J')];
+    const uDir_r = [uDir && usuario_refeicoes[uDir.id]?.includes('C'), uDir && usuario_refeicoes[uDir.id]?.includes('A'), uDir && usuario_refeicoes[uDir.id]?.includes('J')];
 
+    if (uEsq && !ordem_patentes_arr.includes(uEsq.patente)) ordem_patentes_arr.push(uEsq.patente);
+    if (uDir && !ordem_patentes_arr.includes(uDir.patente)) ordem_patentes_arr.push(uDir.patente);
+
+    processaUsuario(uEsq, usuario_refeicoes, totais);
+    processaUsuario(uDir, usuario_refeicoes, totais);
+    
     const tr = document.createElement('tr');
-
-    tr.innerHTML = `
-      <!-- Coluna esquerda -->
-      <td>${uEsq ? `${uEsq.patente} ${uEsq.nome_guerra}` : ''}</td>
-      <td>${uEsq && usuario_refeicoes[uEsq.id]?.includes('C') ? 'SIM' : '-'}</td>
-      <td>${uEsq && usuario_refeicoes[uEsq.id]?.includes('A') ? 'SIM' : '-'}</td>
-      <td>${uEsq && usuario_refeicoes[uEsq.id]?.includes('J') ? 'SIM' : '-'}</td>
-
-      <!-- Espaço entre colunas -->
-      <td style="width: 30px;"></td>
-
-      <!-- Coluna direita -->
-      <td>${uDir ? `${uDir.patente} ${uDir.nome_guerra}` : ''}</td>
-      <td>${uDir && usuario_refeicoes[uDir.id]?.includes('C') ? 'SIM' : '-'}</td>
-      <td>${uDir && usuario_refeicoes[uDir.id]?.includes('A') ? 'SIM' : '-'}</td>
-      <td>${uDir && usuario_refeicoes[uDir.id]?.includes('J') ? 'SIM' : '-'}</td>
-    `;
-
+    tr.innerHTML = `${texto_table_dupla(uEsq, uEsq_r)}<td></td>${texto_table_dupla(uDir, uDir_r)}`;
     tbody.appendChild(tr);
   }
+
+  //totais
+  console.log('totais', totais);
+
+  // preencher totais gerais
+  document.getElementById('total-cafe').textContent = totais['t_c'];
+  document.getElementById('total-almoco').textContent = totais['t_a'];
+  document.getElementById('total-janta').textContent = totais['t_j'];
+
+  // preencher tabela por patente
+  const tbody_rt = document.getElementById('resumo-por-posto');
+  tbody_rt.innerHTML = '';
+
+  ordem_patentes_arr.forEach((patente) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${patente}</td>
+      <td>${totais['t_patente'][patente]['t_c']}</td>
+      <td>${totais['t_patente'][patente]['t_a']}</td>
+      <td>${totais['t_patente'][patente]['t_j']}</td>
+    `;
+    tbody_rt.appendChild(tr);
+  });
+
 }
 
+function carregarArranchamento() {
+  $om_id = 1;
+  $dia = '2025-12-04';
+  fetch(`../api/get_arranchamento.php?dia=${$dia}&om=${$om_id}`)
+    .then(r => r.json())
+    .then(dados => {
 
-  function renderResumoDia() {
-    let totalCafe = 0;
-    let totalAlmoco = 0;
-    let totalJanta = 0;
-  
-    const resumoPatente = {};
-  
-    usuarios.forEach(u => {
-      let refeicoes = { ...u.padrao };
-  
-      // exceção sobrescreve o padrão
-      if (u.excecao) {
-        refeicoes = {
-          cafe: false,
-          almoco: false,
-          janta: false,
-          ...u.excecao
-        };
-      }
-  
-      // totais gerais
-      if (refeicoes.cafe) totalCafe++;
-      if (refeicoes.almoco) totalAlmoco++;
-      if (refeicoes.janta) totalJanta++;
-  
-      // 🔑 chave correta: patente
-      const patente = u.patente;
-  
-      if (!resumoPatente[patente]) {
-        resumoPatente[patente] = {
-          cafe: 0,
-          almoco: 0,
-          janta: 0
-        };
-      }
-  
-      if (refeicoes.cafe) resumoPatente[patente].cafe++;
-      if (refeicoes.almoco) resumoPatente[patente].almoco++;
-      if (refeicoes.janta) resumoPatente[patente].janta++;
-    });
-  
-    // preencher totais gerais
-    document.getElementById('total-cafe').textContent = totalCafe;
-    document.getElementById('total-almoco').textContent = totalAlmoco;
-    document.getElementById('total-janta').textContent = totalJanta;
-  
-    // preencher tabela por patente
-    const tbody = document.getElementById('resumo-por-posto');
-    tbody.innerHTML = '';
-  
-    Object.entries(resumoPatente).forEach(([patente, t]) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${patente}</td>
-        <td>${t.cafe}</td>
-        <td>${t.almoco}</td>
-        <td>${t.janta}</td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }  
+      console.log(dados);
+      relatorios = dados.relatorios;
+      usuarios = dados.usuarios;
 
-  function carregarArranchamento() {
-    $om_id = 1;
-    $dia = '2025-12-04';
-    fetch(`../api/get_arranchamento.php?dia=${$dia}&om=${$om_id}`)
-      .then(r => r.json())
-      .then(dados => {
-  
-        console.log(dados);
+      renderArranchamentoDia();
 
-        relatorios = dados.relatorios;
-        usuarios = dados.usuarios;
-
-        renderArranchamentoDia();
-        renderResumoDia();
-
-        /*
-  
-        spanNome.textContent = dados.nome;
-        spanPatente.textContent = dados.patente;
-        spanOM.textContent = dados.sigla_om;
-  
-        carregarPadraoSemanal(dados.padrao_semanal);
-  
-        excecoes["semanal"] = Array.isArray(dados.excecao_semanal) ? dados.excecao_semanal : [];
-        excecoes["diaria"] = Array.isArray(dados.excecao_diaria) ? dados.excecao_diaria : [];
-        excecoes["manual"] = dados.excecao_manual && !Array.isArray(dados.excecao_manual) ? dados.excecao_manual : {};
-        
-        arranchamento_relatorios.length = 0;
-        dados.arranchamentos_relatorios.forEach(e => arranchamento_relatorios.push(e));
-           
-        renderExcecoes();
-        renderSimulacao();*/
-      })
-      .catch(() => alert('Erro ao carregar dados arranchamento'));
-  }
+      /*
+      spanNome.textContent = dados.nome;
+      spanPatente.textContent = dados.patente;
+      spanOM.textContent = dados.sigla_om;
+      */
+    }
+  ).catch(() => alert('Erro ao carregar dados arranchamento'));
+}
   
   

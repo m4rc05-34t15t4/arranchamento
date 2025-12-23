@@ -191,7 +191,6 @@ border-left: 5px solid #e51e1e;
 
 .tabelas-duplas {
   display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: 16px;
 }
 
@@ -214,7 +213,8 @@ border-left: 5px solid #e51e1e;
 
 .tabela-dia th:nth-child(5), .tabela-dia td:nth-child(5) {
   border: none;
-  width: 30px;
+  width: 15px;
+  min-width: 15px;
   background: none;
 }
 
@@ -222,15 +222,6 @@ border-left: 5px solid #e51e1e;
 .tabela-dia td, .tabela-dia th {
   min-width: 50px;          /* largura mínima para colunas pequenas */
 }
-
-.tabela-dia .tabela-espacamento{
-  min-width: 30px;
-  border: none;
-  background: none;
-}
-
-
-
 
 .simulacao-individual {
   border-left: 5px solid #9ecbff;
