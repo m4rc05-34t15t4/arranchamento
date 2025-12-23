@@ -1,28 +1,26 @@
 <?php
 
-    // Configurações do banco de dados PostgreSQL
-    $host = 'localhost';  // Endereço do servidor
-    $dbname = 'arranchamento';  // Nome do banco de dados
-    $port = '5432'; // porta
-    $username = 'postgres';  // Usuário do banco de dados
-    $password = 'Tr@degunpostgres';  // Senha do banco de dados
+    //Neon sao paulo
+    $host = "ep-dark-brook-acw1joyq.sa-east-1.aws.neon.tech";
+    $dbname = "jogos";
+    $username = "neondb_owner";
+    $password = "npg_5qFZjTsRgy4t";
+    $endpoint = "ep-dark-brook-acw1joyq";
+    $connectionString = " host=$host dbname=$dbname user=$username password=$password sslmode=require options=endpoint=$endpoint";
 
-    if(explode(":", $_SERVER['HTTP_HOST'])[0] == 'localhost'){
-        $password = "admin";
-    }
-
-    //Validar resposta query
-    function validar_resposta_query($r, $k = ""){
-        if ( $r["success"] && is_array($r["data"]) && count($r["data"]) > 0 && is_array($r["data"][0]) && ( $k == "" || $k != "" && array_key_exists($k, $r["data"][0]) ) ) return true;
-        else false;
+    if(is_localhost()){
+        $host = 'localhost';  // Endereço do servidor
+        $dbname = 'arranchamento';  // Nome do banco de dados
+        $port = '5433'; // porta
+        $username = 'postgres';  // Usuário do banco de dados
+        $password = 'postgres';  // Senha do banco de dados
+        $connectionString = "host=$host port=$port dbname=$dbname user=$username password=$password";
     }
 
     // Função para realizar a conexão com o banco de dados PostgreSQL
     function connectToDatabase() {
-        global $host, $dbname, $port, $username, $password;
+        global $connectionString;
         try {
-            // Criando a string de conexão
-            $connectionString = "host=$host port=$port dbname=$dbname user=$username password=$password";
             // Estabelecendo a conexão
             $connection = pg_connect($connectionString);
             if (!$connection) {
@@ -36,6 +34,16 @@
             echo "Erro de conexão: " . $e->getMessage();
             exit();
         }
+    }
+
+    function is_localhost(){
+        return explode(":", $_SERVER['HTTP_HOST'])[0] == 'localhost';
+    }
+
+    //Validar resposta query
+    function validar_resposta_query($r, $k = ""){
+        if ( $r["success"] && is_array($r["data"]) && count($r["data"]) > 0 && is_array($r["data"][0]) && ( $k == "" || $k != "" && array_key_exists($k, $r["data"][0]) ) ) return true;
+        else false;
     }
 
     // Função para executar a consulta SQL e retornar o resultado

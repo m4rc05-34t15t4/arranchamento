@@ -1,27 +1,8 @@
 <?php
 header('Content-Type: application/json');
 
-// ================== CONFIG BANCO ==================
-$host = 'localhost';
-$db   = 'arranchamento';
-$user = 'postgres';
-$pass = 'admin';
-$port = '5432';
+require_once 'db_conexao.php';
 
-try {
-    $pdo = new PDO(
-        "pgsql:host=$host;port=$port;dbname=$db",
-        $user,
-        $pass,
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-    );
-} catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode(['erro' => 'Erro ao conectar no banco']);
-    exit;
-}
-
-// ================== LER JSON ==================
 $input = json_decode(file_get_contents('php://input'), true);
 
 if (!$input) {
@@ -40,33 +21,27 @@ if (!$idUsuario || !$padraoSemanal) {
     exit;
 }
 
-// ================== SEPARAR EXCEÇÕES ==================
 $excecaoSemanal = $excecoes['semanal'] ?? [];
 $excecaoDiaria = $excecoes['diaria'] ?? [];
 $excecaoManual = $excecoes['manual'] ?? [];
 
-// ================== UPDATE ==================
+$padrao = json_encode($padraoSemanal);
+$excecao_semanal = json_encode($excecaoSemanal);
+$excecao_diaria = json_encode($excecaoDiaria);
+$excecao_manual = json_encode($excecaoManual);
 $sql = "
-    UPDATE usuarios
-    SET
-        padrao_semanal   = :padrao,
-        excecao_semanal  = :excecao_semanal,
-        excecao_diaria   = :excecao_diaria,
-        excecao_manual   = :excecao_manual 
-    WHERE id = :id
-";
+    UPDATE usuarios SET
+        padrao_semanal   = '$padrao',
+        excecao_semanal  = '$excecao_semanal',
+        excecao_diaria   = '$excecao_diaria',
+        excecao_manual   = '$excecao_manual' 
+    WHERE id = $idUsuario RETURNING ID;";
 
-$stmt = $pdo->prepare($sql);
+$r = executeQuery($sql);
+if ( $r["success"] && count($r["data"]) > 0 ){
+    echo json_encode([
+        'status' => 'ok',
+        'mensagem' => 'Arranchamento salvo com sucesso'
+    ]);
+} else echo json_encode(['erro' => 'erro ao salvar arranchamento.']);
 
-$stmt->execute([
-    ':padrao'           => json_encode($padraoSemanal),
-    ':excecao_semanal'  => json_encode($excecaoSemanal),
-    ':excecao_diaria'   => json_encode($excecaoDiaria),
-    ':excecao_manual'   => json_encode($excecaoManual),
-    ':id'               => $idUsuario
-]);
-
-echo json_encode([
-    'status' => 'ok',
-    'mensagem' => 'Arranchamento salvo com sucesso'
-]);
