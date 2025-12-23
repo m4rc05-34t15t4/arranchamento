@@ -38,6 +38,7 @@ SELECT
     u.excecao_diaria,
     u.excecao_manual,
     p.nome AS patente,
+    p.ordem AS ordem_patente, 
     o.nome_om,
     o.sigla_om
 FROM usuarios u

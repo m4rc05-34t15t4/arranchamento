@@ -1,3 +1,12 @@
+document.addEventListener('DOMContentLoaded', function() {
+  carregarArranchamento();
+});
+
+
+let relatorios = null;
+let usuarios = null;
+
+
 function extrairPatente(nomeCompleto) {
   const patentes = [
     'Cap',
@@ -22,7 +31,7 @@ function limparNome(nomeCompleto, patente) {
   return nomeCompleto.replace(patente, '').trim();
 }
 
-const usuarios = [
+usuarios = [
   {
     nomeCompleto: 'Cap BUARQUE',
     om: '3º CGEO',
@@ -114,59 +123,56 @@ const usuarios = [
   };
 });
 
-  console.log('dados simlados:', usuarios);
+console.log('dados simlados:', usuarios);
+ 
   
-  
-  function renderArranchamentoDia() {
-    const tbodyEsq = document.getElementById('tabela-dia-esq');
-    const tbodyDir = document.getElementById('tabela-dia-dir');
-  
-    tbodyEsq.innerHTML = '';
-    tbodyDir.innerHTML = '';
-  
-    const hoje = new Date();
-    document.getElementById('data-atual').textContent =
-      hoje.toLocaleDateString('pt-BR', {
-        weekday: 'long',
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      });
-  
-    usuarios.forEach((u, index) => {
-      let refeicoes = { ...u.padrao };
-  
-      // 🔵 exceção sobrescreve
-      if (u.excecao) {
-        refeicoes = {
-          cafe: false,
-          almoco: false,
-          janta: false,
-          ...u.excecao
-        };
-      }
-  
-      const tr = document.createElement('tr');
-  
-      if (u.excecao) {
-        tr.classList.add('simulacao-individual');
-      }
-  
-      tr.innerHTML = `
-        <td>${u.nome}</td>
-        <td>${refeicoes.cafe ? 'SIM' : '-'}</td>
-        <td>${refeicoes.almoco ? 'SIM' : '-'}</td>
-        <td>${refeicoes.janta ? 'SIM' : '-'}</td>
-      `;
-  
-      // ✅ ORDEM INTERCALADA
-      if (index % 2 === 0) {
-        tbodyEsq.appendChild(tr);
-      } else {
-        tbodyDir.appendChild(tr);
-      }
+function renderArranchamentoDia() {
+  const tbody = document.getElementById('tabela-dia-body');
+
+  // Limpa tabela
+  tbody.innerHTML = '';
+
+  // Atualiza data atual
+  const dataArranchamento = new Date();
+  document.getElementById('data-atual').textContent =
+    dataArranchamento.toLocaleDateString('pt-BR', {
+      weekday: 'long',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
     });
+
+  // Converte string JSON em objeto
+  const usuario_refeicoes = JSON.parse(relatorios["usuarios_refeicoes"]);
+
+  // Percorre usuários em pares (esquerda/direita)
+  for (let i = 0; i < usuarios.length; i += 2) {
+    const uEsq = usuarios[i];
+    const uDir = usuarios[i + 1];
+
+    const tr = document.createElement('tr');
+
+    tr.innerHTML = `
+      <!-- Coluna esquerda -->
+      <td>${uEsq ? `${uEsq.patente} ${uEsq.nome_guerra}` : ''}</td>
+      <td>${uEsq && usuario_refeicoes[uEsq.id]?.includes('C') ? 'SIM' : '-'}</td>
+      <td>${uEsq && usuario_refeicoes[uEsq.id]?.includes('A') ? 'SIM' : '-'}</td>
+      <td>${uEsq && usuario_refeicoes[uEsq.id]?.includes('J') ? 'SIM' : '-'}</td>
+
+      <!-- Espaço entre colunas -->
+      <td style="width: 30px;"></td>
+
+      <!-- Coluna direita -->
+      <td>${uDir ? `${uDir.patente} ${uDir.nome_guerra}` : ''}</td>
+      <td>${uDir && usuario_refeicoes[uDir.id]?.includes('C') ? 'SIM' : '-'}</td>
+      <td>${uDir && usuario_refeicoes[uDir.id]?.includes('A') ? 'SIM' : '-'}</td>
+      <td>${uDir && usuario_refeicoes[uDir.id]?.includes('J') ? 'SIM' : '-'}</td>
+    `;
+
+    tbody.appendChild(tr);
   }
+}
+
 
   function renderResumoDia() {
     let totalCafe = 0;
@@ -229,8 +235,41 @@ const usuarios = [
       tbody.appendChild(tr);
     });
   }  
+
+  function carregarArranchamento() {
+    $om_id = 1;
+    $dia = '2025-12-04';
+    fetch(`../api/get_arranchamento.php?dia=${$dia}&om=${$om_id}`)
+      .then(r => r.json())
+      .then(dados => {
   
-  renderArranchamentoDia();
-  renderResumoDia();
+        console.log(dados);
+
+        relatorios = dados.relatorios;
+        usuarios = dados.usuarios;
+
+        renderArranchamentoDia();
+        renderResumoDia();
+
+        /*
+  
+        spanNome.textContent = dados.nome;
+        spanPatente.textContent = dados.patente;
+        spanOM.textContent = dados.sigla_om;
+  
+        carregarPadraoSemanal(dados.padrao_semanal);
+  
+        excecoes["semanal"] = Array.isArray(dados.excecao_semanal) ? dados.excecao_semanal : [];
+        excecoes["diaria"] = Array.isArray(dados.excecao_diaria) ? dados.excecao_diaria : [];
+        excecoes["manual"] = dados.excecao_manual && !Array.isArray(dados.excecao_manual) ? dados.excecao_manual : {};
+        
+        arranchamento_relatorios.length = 0;
+        dados.arranchamentos_relatorios.forEach(e => arranchamento_relatorios.push(e));
+           
+        renderExcecoes();
+        renderSimulacao();*/
+      })
+      .catch(() => alert('Erro ao carregar dados arranchamento'));
+  }
   
   

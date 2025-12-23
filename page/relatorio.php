@@ -21,29 +21,22 @@
 
     <div class="tabelas-duplas resumo-card">
 
-      <table class="tabela-dia">
-        <thead>
-          <tr>
-            <th>Usuário</th>
-            <th>C</th>
-            <th>A</th>
-            <th>J</th>
-          </tr>
-        </thead>
-        <tbody id="tabela-dia-esq"></tbody>
-      </table>
-
-      <table class="tabela-dia">
-        <thead>
-          <tr>
-            <th>Usuário</th>
-            <th>C</th>
-            <th>A</th>
-            <th>J</th>
-          </tr>
-        </thead>
-        <tbody id="tabela-dia-dir"></tbody>
-      </table>
+    <table class="tabela-dia">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Café</th>
+          <th>Almoço</th>
+          <th>Janta</th>
+          <th class="tabela-espacamento"></th>
+          <th>Nome</th>
+          <th>Café</th>
+          <th>Almoço</th>
+          <th>Janta</th>
+        </tr>
+      </thead>
+      <tbody id="tabela-dia-body"></tbody>
+    </table>
 
     </div>
 

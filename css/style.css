@@ -201,17 +201,36 @@ border-left: 5px solid #e51e1e;
   font-size: 14px;
 }
 
-.tabela-dia th,
-.tabela-dia td {
-  padding: 6px 8px;
-  border-bottom: 1px solid #ccc;
-  text-align: center;
-}
-
-.tabela-dia th:first-child,
-.tabela-dia td:first-child {
+.tabela-dia th:first-child, .tabela-dia td:first-child {
   text-align: left;
 }
+
+.tabela-dia th, .tabela-dia td {
+  padding: 6px 10px;
+  text-align: center;
+  border: 1px solid #ccc;
+  white-space: nowrap;       /* impede que o texto quebre linhas */
+}
+
+.tabela-dia th:nth-child(5), .tabela-dia td:nth-child(5) {
+  border: none;
+  width: 30px;
+  background: none;
+}
+
+/* opcional: deixa colunas esquerda/direita flexíveis */
+.tabela-dia td, .tabela-dia th {
+  min-width: 50px;          /* largura mínima para colunas pequenas */
+}
+
+.tabela-dia .tabela-espacamento{
+  min-width: 30px;
+  border: none;
+  background: none;
+}
+
+
+
 
 .simulacao-individual {
   border-left: 5px solid #9ecbff;
@@ -304,6 +323,7 @@ border-left: 5px solid #e51e1e;
   outline-offset: -5px;
   animation: fadeBorder 1.0s ease-in-out forwards;
 }
+
 
 @keyframes fadeBorder {
   0% {
