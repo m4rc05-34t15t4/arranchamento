@@ -1,21 +1,15 @@
 <?php
 
-    //Neon sao paulo
-    $host = "ep-dark-brook-acw1joyq.sa-east-1.aws.neon.tech";
-    $dbname = "jogos";
-    $username = "neondb_owner";
-    $password = "npg_5qFZjTsRgy4t";
-    $endpoint = "ep-dark-brook-acw1joyq";
-    $connectionString = " host=$host dbname=$dbname user=$username password=$password sslmode=require options=endpoint=$endpoint";
+    require_once('variavel_conexao.php');
 
-    if(is_localhost()){
+    /*if(is_localhost()){
         $host = 'localhost';  // Endereço do servidor
         $dbname = 'arranchamento';  // Nome do banco de dados
         $port = '5433'; // porta
         $username = 'postgres';  // Usuário do banco de dados
         $password = 'postgres';  // Senha do banco de dados
         $connectionString = "host=$host port=$port dbname=$dbname user=$username password=$password";
-    }
+    }*/
 
     // Função para realizar a conexão com o banco de dados PostgreSQL
     function connectToDatabase() {
