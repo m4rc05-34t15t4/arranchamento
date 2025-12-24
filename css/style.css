@@ -356,6 +356,10 @@ border-left: 5px solid #1e88e5;
   animation: fadeBorder 1.0s ease-in-out forwards;
 }
 
+.td-diferente {
+  background-color: #fff3cd; /* amarelo suave */
+  transition: background-color 0.3s ease;
+}
 
 @keyframes fadeBorder {
   0% {

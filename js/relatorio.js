@@ -26,13 +26,24 @@ document.addEventListener('DOMContentLoaded', function() {
       window.location.href = `?dia=${novaData}`;
     });
   });
-  
-  
 
+  document.getElementById('chk-diferencas').addEventListener('change', function () {
+    const mostrar = this.checked;
+
+    document.querySelectorAll('.t_dia_refeicao[diferente="s"]').forEach(td => {
+      if (mostrar) {
+        td.classList.add('td-diferente');
+      } else {
+        td.classList.remove('td-diferente');
+      }
+    });
+  });
+  
 });
 
 let relatorios = null;
 let usuarios = null;
+let houve_mudancas_arranchamento = false;
 
 function initPatente(patente, totais) {
   if (!totais.t_patente[patente]) {
@@ -69,16 +80,81 @@ function processaUsuario(usuario, usuario_refeicoes, totais, mapaPatenteRancho) 
   }
 }
 
-function texto_table_dupla(uEsq, uEsq_r){
-  return `<td class="t_dia_nome">${uEsq ? `${uEsq.patente} ${uEsq.nome_guerra}` : ''}</td>
-      <td class="t_dia_refeicao">${uEsq_r[0] ? '✔️' : '-'}</td>
-      <td class="t_dia_refeicao">${uEsq_r[1] ? '✔️' : '-'}</td>
-      <td class="t_dia_refeicao">${uEsq_r[2] ? '✔️' : '-'}</td>`;
+function texto_table_dupla(uEsq, uEsq_r, existe_arranchamento){
+  if(uEsq){
+    texto = `<td class="t_dia_nome">${uEsq ? `${uEsq.patente} ${uEsq.nome_guerra}` : ''}</td>`;
+    ['cafe', 'almoco', 'janta'].forEach((valor, index) => {
+      dif = 'n';
+      if( uEsq['relatorio_previsao_CAJ'][index] != uEsq_r[index] ) {
+        dif = 's';
+        houve_mudancas_arranchamento = true;
+      }
+      texto += `<td class="t_dia_refeicao" tipo_refeicao="${valor}" diferente="${dif}" previsao="${uEsq['relatorio_previsao_CAJ'][index]}" refeicao="${ existe_arranchamento ? uEsq_r[index] : '-' }">${uEsq_r[index] ? '✔️' : '-'} </td>`;
+    });
+    return texto;
+  }
+  else return `<td colspan="4"></td>`;
 }
 
 function nova_datahora(datahora){
    const [ano, mes, dia] = datahora.split('-');
    return new Date(ano, mes - 1, dia);
+}
+
+function normalizarSigla(sigla) {
+  if (!sigla || typeof sigla !== 'string') return '';
+  return ['C', 'A', 'J']
+    .filter(l => sigla.includes(l))
+    .join('');
+}
+
+function gerarSiglaUsuario(usuario, dataObj) {
+  if(!usuario) return null;
+  const diasSemana = [
+    'Domingo',
+    'Segunda',
+    'Terça',
+    'Quarta',
+    'Quinta',
+    'Sexta',
+    'Sábado'
+  ];
+  // 🔒 normaliza a data (evita bug de fuso)
+  const data = new Date(
+    dataObj.getFullYear(),
+    dataObj.getMonth(),
+    dataObj.getDate()
+  );
+  const diaSemana = diasSemana[data.getDay()];
+  // ISO YYYY-MM-DD para buscar exceções por data
+  const dataISO = data.toISOString().slice(0, 10);
+  const excecaoManual  = JSON.parse(usuario.excecao_manual  || '{}');
+  const excecaoDiaria  = JSON.parse(usuario.excecao_diaria  || '{}');
+  const excecaoSemanal = JSON.parse(usuario.excecao_semanal || '[]');
+  const padraoSemanal  = JSON.parse(usuario.padrao_semanal  || '{}');
+
+  // 1️⃣ EXCEÇÃO MANUAL (maior prioridade)
+  if (excecaoManual[dataISO]) {
+    return normalizarSigla(excecaoManual[dataISO]);
+  }
+  // 2️⃣ EXCEÇÃO DIÁRIA
+  if (excecaoDiaria[dataISO]) {
+    return normalizarSigla(excecaoDiaria[dataISO]);
+  }
+  // 3️⃣ EXCEÇÃO SEMANAL
+  for (const e of excecaoSemanal) {
+    const inicio = new Date(e.inicio + 'T00:00:00');
+    const fim    = new Date(e.fim + 'T23:59:59');
+
+    if (data >= inicio && data <= fim) {
+      const sigla = e.configuracao?.[diaSemana];
+      if (sigla !== undefined) {
+        return normalizarSigla(sigla);
+      }
+    }
+  }
+  // 4️⃣ PADRÃO SEMANAL
+  return normalizarSigla(padraoSemanal[diaSemana] || '');
 }
   
 function renderArranchamentoDia() {
@@ -111,12 +187,20 @@ function renderArranchamentoDia() {
       year: 'numeric'
     })}`;
 
+  //criar previsão com base no padrão atual do usuario
+  usuario_previsao = {};
+  for (let i = 0; i < usuarios.length; i++) {
+    const usu = usuarios[i];
+    relatorio_previsao_usu = gerarSiglaUsuario(usu, dataArranchamento);
+    usuario_previsao[usuarios[i]['id']] = relatorio_previsao_usu;
+    usuarios[i]['relatorio_previsao'] = relatorio_previsao_usu;
+    usuarios[i]['relatorio_previsao_CAJ'] = [ relatorio_previsao_usu?.includes('C'), relatorio_previsao_usu?.includes('A'), relatorio_previsao_usu?.includes('J') ];
+  }
+  
   // Converte string JSON em objeto
   let usuario_refeicoes = null;
   if(existe_arranchamento) usuario_refeicoes = JSON.parse(relatorios["usuarios_refeicoes"]);
-  else{
-    //ajustar previsão do dia
-  }
+  else usuario_refeicoes = {...usuario_previsao};
 
   const totais = {
     t_c: 0,
@@ -152,7 +236,7 @@ function renderArranchamentoDia() {
     const uDir = usuarios[i + 1];
     const uEsq_r = [uEsq && usuario_refeicoes[uEsq.id]?.includes('C'), uEsq && usuario_refeicoes[uEsq.id]?.includes('A'), uEsq && usuario_refeicoes[uEsq.id]?.includes('J')];
     const uDir_r = [uDir && usuario_refeicoes[uDir.id]?.includes('C'), uDir && usuario_refeicoes[uDir.id]?.includes('A'), uDir && usuario_refeicoes[uDir.id]?.includes('J')];
-
+    
     if (uEsq && !ordem_patentes_arr.includes(uEsq.patente)) ordem_patentes_arr.push(uEsq.patente);
     if (uDir && !ordem_patentes_arr.includes(uDir.patente)) ordem_patentes_arr.push(uDir.patente);
 
@@ -160,7 +244,7 @@ function renderArranchamentoDia() {
     processaUsuario(uDir, usuario_refeicoes, totais, mapaPatenteRancho);
     
     const tr = document.createElement('tr');
-    tr.innerHTML = `${texto_table_dupla(uEsq, uEsq_r)}<td></td>${texto_table_dupla(uDir, uDir_r)}`;
+    tr.innerHTML = `${texto_table_dupla(uEsq, uEsq_r, existe_arranchamento)}<td></td>${texto_table_dupla(uDir, uDir_r, existe_arranchamento)}`;
     tbody.appendChild(tr);
   }
 

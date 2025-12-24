@@ -20,6 +20,10 @@
       <div class="titulo-centro">
         <h2 id="data-atual"></h2>
         <h5 id="data-atualizacao"></h5>
+        <label style="margin-top:8px; display:flex; gap:6px; align-items:center;">
+          <input type="checkbox" id="chk-diferencas">
+          Exibir mudanças no arranchamento
+        </label>
       </div>
       <button id="btn-proximo"  class="botao-menu">▶</button>
     </div>

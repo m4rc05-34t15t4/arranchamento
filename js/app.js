@@ -23,71 +23,59 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btnConfirmarExclusao')
     .addEventListener('click', confirmarExclusao);
 
+  document.getElementById('dataInicio').addEventListener('change', () => {
+    atualizarDiasSemanaExcecao();
+    const inicio = document.getElementById('dataInicio');
+    const fim = document.getElementById('dataFim');
+    const hoje = new Date().toISOString().slice(0, 10);
+    if (!inicio.value) return;
+    if (inicio.value < hoje && excecaoEmEdicao == null) inicio.value = hoje; // ❌ não permitir data inicio antes de hoje
+    fim.min = inicio.value; // fim nunca pode ser antes do início
+    if (fim.value && fim.value < inicio.value) fim.value = inicio.value;
+    gerarDiasIndividuais(); // se estiver no modo individual
+  });
 
-  document.getElementById('dataInicio')
-    .addEventListener('change', atualizarDiasSemanaExcecao);
-  
-  document.getElementById('dataFim')
-    .addEventListener('change', atualizarDiasSemanaExcecao);
+  document.getElementById('dataFim').addEventListener('change', () => {
+    atualizarDiasSemanaExcecao();
+    const inicio = document.getElementById('dataInicio');
+    const fim = document.getElementById('dataFim');
+    const hoje = new Date().toISOString().slice(0, 10);
+    if (!fim.value) return;
+    if (fim.value < hoje) fim.value = hoje; // ❌ não permitir data fim antes de hoje
+    if (inicio.value && fim.value < inicio.value) inicio.value = fim.value; // ❌ não permitir fim antes do início
+    gerarDiasIndividuais();
+  });
 
-    document.getElementById('dataInicio').addEventListener('change', () => {
-      const inicio = document.getElementById('dataInicio');
-      const fim = document.getElementById('dataFim');
-      if (!inicio.value) return;
-      // fim nunca pode ser antes do início
-      fim.min = inicio.value;
-      if (fim.value && fim.value < inicio.value) {
-        fim.value = inicio.value;
-      }
-      gerarDiasIndividuais(); // se estiver no modo individual
-    });
+  //edicao manual excessao direto na simulação
+  document.addEventListener('click', function (e) {
+    const td = e.target;
+    if (td.matches('tr:not(.simulacao-travada) td.refeicao')) {
+      // alterna o ícone
+      td.textContent = td.textContent.includes(check_icone) ? '-' : check_icone;
+      const tr = td.closest('tr');
+      const cajAtual = obterCAJDaLinha(tr);
+      aplicarExcecaoManualDaLinha(tr, cajAtual);
+    }
+  });
 
-    document.getElementById('dataFim').addEventListener('change', () => {
-      const inicio = document.getElementById('dataInicio');
-      const fim = document.getElementById('dataFim');
-      if (!fim.value) return;
-      const hoje = new Date().toISOString().slice(0, 10);
-      // ❌ não permitir data fim antes de hoje
-      if (fim.value < hoje) {
-        fim.value = hoje;
+  document.addEventListener('click', function (e) {
+    //if (e.target.classList.contains('lista-excessoes-td-refeicao')) console.log(e.target.textContent);
+    const el = e.target.closest('.lista-excessoes-td-refeicao');
+    if (!el) return;
+    const tr = el.closest('tr');
+    if (!tr) return;
+    const dataInicial = tr.getAttribute('data_inicial');
+    const anoMes_ref = dataInicial.slice(0, 7);
+    const primeiraTr = document.querySelector('#tabela-simulacao tr');
+    if (primeiraTr) {
+      const data = primeiraTr.getAttribute('data');
+      const anoMes_simulacao = data.slice(0, 7);
+      if(anoMes_simulacao != anoMes_ref){
+        renderSimulacao(new Date(dataInicial));
       }
-      // ❌ não permitir fim antes do início
-      if (inicio.value && fim.value < inicio.value) {
-        inicio.value = fim.value;
-      }
-      gerarDiasIndividuais();
-    });
-
-    //edicao manual excessao direto na simulação
-    document.addEventListener('click', function (e) {
-      const td = e.target;
-      if (td.matches('tr:not(.simulacao-travada) td.refeicao')) {
-        // alterna o ícone
-        td.textContent = td.textContent.includes(check_icone) ? '-' : check_icone;
-        const tr = td.closest('tr');
-        const cajAtual = obterCAJDaLinha(tr);
-        aplicarExcecaoManualDaLinha(tr, cajAtual);
-      }
-    });
-
-    document.addEventListener('click', function (e) {
-      //if (e.target.classList.contains('lista-excessoes-td-refeicao')) console.log(e.target.textContent);
-      const el = e.target.closest('.lista-excessoes-td-refeicao');
-      if (!el) return;
-      const tr = el.closest('tr');
-      if (!tr) return;
-      const dataInicial = tr.getAttribute('data_inicial');
-      const anoMes_ref = dataInicial.slice(0, 7);
-      const primeiraTr = document.querySelector('#tabela-simulacao tr');
-      if (primeiraTr) {
-        const data = primeiraTr.getAttribute('data');
-        const anoMes_simulacao = data.slice(0, 7);
-        if(anoMes_simulacao != anoMes_ref){
-          renderSimulacao(new Date(dataInicial));
-        }
-      }
-      scrollParaData(dataInicial);
-    });
+    }
+    scrollParaData(dataInicial);
+  });
 
 });
 
@@ -305,6 +293,7 @@ function abrirDialog() {
 }
 
 function fecharDialog() {
+  excecaoEmEdicao = null;
   dialog.close();
 }
 
