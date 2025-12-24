@@ -13,11 +13,15 @@
 
 <main class="pagina-dia">
 
-  <div class="tabelas-div" style="max-width: 1200px">
+  <div class="tabelas-div">
 
-    <div>
-      <h2>Arranchamento – <span id="data-atual"></span></h2>
-      <h5 id="data-atualizacao"></h5>
+    <div id="titulo-arranchamento">
+      <button id="btn-anterior" class="botao-menu">◀</button>
+      <div class="titulo-centro">
+        <h2 id="data-atual"></h2>
+        <h5 id="data-atualizacao"></h5>
+      </div>
+      <button id="btn-proximo"  class="botao-menu">▶</button>
     </div>
 
     <div class="tabelas-duplas resumo-card">
@@ -25,15 +29,15 @@
     <table class="tabela-dia">
       <thead>
         <tr>
-          <th>Nome</th>
-          <th>Café</th>
-          <th>Almoço</th>
-          <th>Janta</th>
+          <th class="t_dia_nome">Nome</th>
+          <th class="t_dia_refeicao">Café</th>
+          <th class="t_dia_refeicao">Almoço</th>
+          <th class="t_dia_refeicao">Janta</th>
           <th></th>
-          <th>Nome</th>
-          <th>Café</th>
-          <th>Almoço</th>
-          <th>Janta</th>
+          <th class="t_dia_nome">Nome</th>
+          <th class="t_dia_refeicao">Café</th>
+          <th class="t_dia_refeicao">Almoço</th>
+          <th class="t_dia_refeicao">Janta</th>
         </tr>
       </thead>
       <tbody id="tabela-dia-body"></tbody>
@@ -43,16 +47,43 @@
 
     <div class="resumo-arranchamento">
 
-      <h3>Resumo do Arranchamento do Dia</h3>
-
       <div class="resumo-blocos">
 
         <!-- Totais gerais -->
         <div class="resumo-card">
           <h4>Total Geral</h4>
-          <p>Café: <strong id="total-cafe">0</strong></p>
-          <p>Almoço: <strong id="total-almoco">0</strong></p>
-          <p>Janta: <strong id="total-janta">0</strong></p>
+          <table>
+            <thead>
+              <tr>
+                <th>Café</th>
+                <th>Almoço</th>
+                <th>Janta</th>
+              </tr>
+            </thead>
+            <tbody id="resumo-por-refeicao">
+              <tr>
+                <td id="total-cafe"></td>
+                <td id="total-almoco"></td>
+                <td id="total-janta"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Totais por rancho -->
+        <div class="resumo-card">
+          <h4>Rancho</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>Rancho</th>
+                <th>Café</th>
+                <th>Almoço</th>
+                <th>Janta</th>
+              </tr>
+            </thead>
+            <tbody id="resumo-por-rancho"></tbody>
+          </table>
         </div>
 
         <!-- Totais por posto -->

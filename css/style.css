@@ -1,3 +1,7 @@
+:root {
+  --azul-principal: #1e88e5;
+  --azul-claro: #9ec9ff;
+}
 body { font-family: Arial, sans-serif; background:#f4f6f8; margin:0; padding:20px; padding-top: 40px; }
 h1, h2, h3 { margin-top:0; }
 .card { background:#fff; border-radius:8px; padding:16px; margin-bottom:20px; box-shadow:0 2px 6px rgba(0,0,0,.1); min-width: 550px; max-width: 600px;}
@@ -20,7 +24,7 @@ dialog { border:none; border-radius:8px; }
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
-  background: #1e88e5;
+  background: var(--azul-principal);
   color: #fff;
   z-index: 1000;
 }
@@ -115,8 +119,8 @@ background-color: #e3f2fd; /* azul claro */
 border-left: 5px solid #1e88e5;
 }
 .simulacao-manual {
-background-color: #fde3e3; /* azul claro */
-border-left: 5px solid #e51e1e;
+  background-color: #fde3e3; /* azul claro */
+  border-left: 5px solid #e51e1e;
 }
 #modo-semanal thead {
   background-color: #fff3e0;       /* mesmo fundo do simulacao-semanal */
@@ -165,6 +169,34 @@ border-left: 5px solid #e51e1e;
   min-width: 700px;
 }
 
+#titulo-arranchamento {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.botao-menu {
+  margin: 0 50px 0 50px ;
+  background-color: #CCC;
+  font-size: 24px;
+}
+.botao-menu:hover{
+  background-color: var(--azul-claro);
+}
+
+#titulo-arranchamento h2 {
+  margin-bottom: 0;
+}
+
+#titulo-arranchamento h5 {
+  color: #999;              /* cor mais clara */
+  font-style: italic;       /* itálico */
+  text-align: right;        /* alinhado à direita */
+  margin-top: 5px;
+}
+
 /* Cards visuais */
 .card {
   background: #fff;
@@ -190,17 +222,18 @@ border-left: 5px solid #e51e1e;
 }
 
 .tabelas-duplas {
+  margin: 0 auto;   /* 👈 centraliza sem alterar tamanho */
   display: grid;
   gap: 16px;
 }
 
 .tabela-dia {
-  width: 100%;
+  /*width: 100%;*/
   border-collapse: collapse;
   font-size: 14px;
 }
 
-.tabela-dia th:first-child, .tabela-dia td:first-child {
+.tabela-dia th:first-child, .tabela-dia td:first-child, .tabela-dia th:nth-child(6), .tabela-dia td:nth-child(6) {
   text-align: left;
 }
 
@@ -218,9 +251,14 @@ border-left: 5px solid #e51e1e;
   background: none;
 }
 
-/* opcional: deixa colunas esquerda/direita flexíveis */
-.tabela-dia td, .tabela-dia th {
-  min-width: 50px;          /* largura mínima para colunas pequenas */
+.tabela-dia .t_dia_nome {
+  max-width: 250px;
+  min-width: 250px;
+}
+
+.tabela-dia .t_dia_refeicao {
+  max-width: 50px;
+  min-width: 50px;
 }
 
 .simulacao-individual {
@@ -239,10 +277,11 @@ border-left: 5px solid #e51e1e;
 .tabelas-div {
   width: 100%;
   max-width: 1200px;
-
   display: flex;
   flex-direction: column;
+  align-items: flex-start;   /* alinha pelo topo */
   gap: 16px;
+  margin: 0 auto; 
 }
 
 .resumo-arranchamento {
@@ -254,6 +293,8 @@ border-left: 5px solid #e51e1e;
   display: flex;
   gap: 24px;
   flex-wrap: wrap;
+  justify-content: center;   /* centraliza horizontalmente */
+  align-items: flex-start;   /* alinha pelo topo */
 }
 
 .resumo-card {
