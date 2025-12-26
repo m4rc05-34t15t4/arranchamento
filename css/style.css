@@ -357,8 +357,176 @@ border-left: 5px solid #1e88e5;
 }
 
 .td-diferente {
-  background-color: #fff3cd; /* amarelo suave */
-  transition: background-color 0.3s ease;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(25, 135, 84, 0.15) 0px,
+    rgba(25, 135, 84, 0.15) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+  transition: background 0.3s ease;
+}
+
+#checkbox-exibir-mudancas {
+  margin-top:8px;
+  margin-right: 20px;
+  display: none; 
+  gap:6px; 
+  align-items:center;
+}
+
+.toggle-switch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  user-select: none;
+}
+
+/* checkbox invisível mas funcional */
+.toggle-switch input {
+  position: absolute;
+  opacity: 0;
+}
+
+/* trilho */
+.toggle-switch .slider {
+  width: 46px;
+  height: 24px;
+  background: #ccc;
+  border-radius: 24px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+/* bolinha */
+.toggle-switch .slider::before {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 2px;
+  left: 2px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+
+/* ligado */
+#chk-diferencas:checked + .slider {
+  background: #02a66a;
+}
+
+#chk-diferencas:checked + .slider::before {
+  transform: translateX(22px);
+}
+
+.label-text {
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+
+#data-atualizacao{
+  margin-bottom: 10px;
+}
+
+.acoes-arranchamento {
+  display: flex;          /* 👈 coloca lado a lado */
+  align-items: center;    /* 👈 alinha verticalmente */
+  gap: 16px;              /* 👈 espaço entre checkbox e botão */
+  justify-content: center;
+}
+
+.btn-gerar, .btn-imprimir {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  background: #02a66a;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 20px;
+}
+.btn-gerar:hover, .btn-imprimir:hover {
+  background: #017e4e;
+}
+
+.btn-gerar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-gerar.loading {
+  pointer-events: none;
+  position: relative;
+}
+
+.btn-gerar.loading::after {
+  content: "Gerando...";
+}
+
+#btnImprimirArranchamento {
+  display: none;
+}
+
+.watermark {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+
+  display: none; /*flex*/
+  align-items: center;
+  justify-content: center;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+.watermark span {
+  padding: 120px;              /* 👈 controla o “respiro” */
+  font-size: 10rem;
+  font-weight: 800;
+  color: rgba(0, 0, 0, 0.06);
+  letter-spacing: 1rem;
+  text-transform: uppercase;
+
+  transform: rotate(-30deg);
+  white-space: nowrap;
+}
+
+#btnBloquearDia{
+  padding: 0;
+}
+
+.btn-bloqueio {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.btn-cadeado {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 34px; /* 👈 controla o tamanho */
+  line-height: 1;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.btn-cadeado.aberto {
+  opacity: 0.3;
+  color: #666;
+}
+
+.btn-cadeado.bloqueado {
+  opacity: 1;
+  color: #d9534f; /* vermelho */
+}
+
+.btn-cadeado:hover {
+  transform: scale(1.15);
 }
 
 @keyframes fadeBorder {
@@ -386,4 +554,157 @@ border-left: 5px solid #1e88e5;
   .col-direita {
     position: static;
   }
+}
+
+@media print {
+
+  /* remove margens padrão */
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 11px;
+  }
+
+  .pagina-dia{
+    margin: 0 0 0 0;
+    background: none;
+  }
+
+  /* 🔥 ESCONDE TUDO QUE NÃO INTERESSA */
+  button,
+  .acoes-arranchamento,
+  .botao-menu,
+  #checkbox-exibir-mudancas,
+  #btnBloquearDia {
+    display: none !important;
+  }
+
+  header.topbar {
+    display: none !important;
+    position: static;
+    margin-bottom: 20px;
+  }
+
+  /* mantém o cabeçalho */
+  header.topbar {
+    display: flex;
+    border-bottom: 1px solid #000;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+  }
+
+  header .logo {
+    width: 40px;
+    height: auto;
+  }
+
+  /* ajusta títulos */
+  h1 {
+    font-size: 18px;
+    margin: 0;
+  }
+
+  h2 {
+    font-size: 14px;
+    margin: 6px 0;
+  }
+
+  h4 {
+    margin: 6px 0;
+  }
+
+  /* tabela principal */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    page-break-inside: avoid;
+  }
+
+  th, td {
+    border: 1px solid #000;
+    padding: 4px 6px;
+    text-align: center;
+  }
+
+  th.t_dia_nome,
+  td.t_dia_nome {
+    text-align: left;
+  }
+
+  /* remove colunas vazias */
+  td:empty,
+  th:empty {
+    display: none;
+  }
+
+  .resumo-card{
+    background: none;
+    border: none;
+    border-radius: none;
+    padding: 16px;
+    min-width: 260px;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  #data-atual, #data-atualizacao{
+    font-size: 24px;
+  }
+
+  #data-atual {
+    text-align: center;
+  }
+
+  #data-atualizacao{
+    display: none;
+  }
+
+  /* NÃO força nova página */
+  .resumo-arranchamento {
+    page-break-before: auto;
+    page-break-inside: avoid;
+  }
+
+  /* mantém os cards juntos */
+  .resumo-blocos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    page-break-inside: avoid;
+  }
+
+  .resumo-card table tr td, .resumo-card table thead tr th {
+    border: solid 1px #CCC;
+  }
+
+  .resumo-card table thead th {
+    background-color: #DDD !important;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .resumo-card table tbody tr:nth-child(odd) {
+    background-color: #f9f9f9 !important;
+  }
+
+  .resumo-card table tbody tr:nth-child(even) {
+    background-color: #ffffff !important;
+  }
+
+  .td-diferente {
+    background: none !important;
+  }
+
+  .watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-30deg);
+  }
+
 }

@@ -9,6 +9,8 @@
 </head>
 <body>
 
+<div class="watermark"><span>Previsão</span></div>
+
 <?php include 'header.php'; ?>
 
 <main class="pagina-dia">
@@ -20,10 +22,20 @@
       <div class="titulo-centro">
         <h2 id="data-atual"></h2>
         <h5 id="data-atualizacao"></h5>
-        <label style="margin-top:8px; display:flex; gap:6px; align-items:center;">
-          <input type="checkbox" id="chk-diferencas">
-          Exibir mudanças no arranchamento
-        </label>
+        <div class="acoes-arranchamento">
+          <button id="btnBloquearDia" class="btn-cadeado aberto" title="Dia aberto">🔓</button>
+          <div id="checkbox-exibir-mudancas" class="toggle-switch">
+            <input type="checkbox" id="chk-diferencas">
+            <label for="chk-diferencas" class="slider"></label>
+            <label for="chk-diferencas" class="label-text">
+              Exibir mudanças<br>no arranchamento
+            </label>
+          </div>
+          <button id="btnGerarArranchamento" class="btn-gerar" data-acao="atualizar">
+            <span id="acao_salvar_arranchamento">Atualizar</span> Arranchamento
+          </button>
+          <button id="btnImprimirArranchamento" class="btn-imprimir">Imprimir</button>
+        </div>
       </div>
       <button id="btn-proximo"  class="botao-menu">▶</button>
     </div>
@@ -62,6 +74,7 @@
                 <th>Café</th>
                 <th>Almoço</th>
                 <th>Janta</th>
+                <th>Serviço</th>
               </tr>
             </thead>
             <tbody id="resumo-por-refeicao">
@@ -69,6 +82,7 @@
                 <td id="total-cafe"></td>
                 <td id="total-almoco"></td>
                 <td id="total-janta"></td>
+                <td id="total-servico"></td>
               </tr>
             </tbody>
           </table>
@@ -84,6 +98,7 @@
                 <th>Café</th>
                 <th>Almoço</th>
                 <th>Janta</th>
+                <th>Serviço</th>
               </tr>
             </thead>
             <tbody id="resumo-por-rancho"></tbody>

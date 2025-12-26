@@ -713,11 +713,9 @@ function carregarUsuario() {
       excecoes["semanal"] = Array.isArray(dados.excecao_semanal) ? dados.excecao_semanal : [];
       excecoes["diaria"] = Array.isArray(dados.excecao_diaria) ? dados.excecao_diaria : [];
       excecoes["manual"] = dados.excecao_manual && !Array.isArray(dados.excecao_manual) ? dados.excecao_manual : {};
-
-      console.log('sss', dados.arranchamentos_relatorios);
       
-      //arranchamento_relatorios.length = 0;
-      //JSON.parse(dados.arranchamentos_relatorios).forEach(e => arranchamento_relatorios.push(e));
+      arranchamento_relatorios.length = 0;
+      dados.arranchamentos_relatorios.forEach(e => arranchamento_relatorios.push(e));
          
       renderExcecoes();
       renderSimulacao();

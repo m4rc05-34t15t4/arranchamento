@@ -41,18 +41,20 @@
     //arranchamentos_anteriores
     $registros = null;
     $sql = "
-    SELECT id as id_relatorio, data_relatorio, usuarios_refeicoes, data_atualizacao FROM relatorios
-    WHERE data_relatorio >= date_trunc('month', CURRENT_DATE) - INTERVAL '1 month'
-    AND jsonb_exists(usuarios_refeicoes::jsonb, '$id');";
+        SELECT id as id_relatorio, data_relatorio, usuarios_refeicoes, data_atualizacao FROM relatorios
+        WHERE data_relatorio >= date_trunc('month', CURRENT_DATE) - INTERVAL '1 month'
+        AND ( jsonb_exists(usuarios_refeicoes::jsonb, '$id') OR usuarios_refeicoes::jsonb = '{}'::jsonb ) 
+		ORDER BY data_relatorio;";
     $r = executeQuery($sql);
-    if ( $r["success"] && count($r["data"]) > 0 ) $registros = $r["data"][0];
+    if ( $r["success"] && count($r["data"]) > 0 ) $registros = $r["data"];
 
     // 🔄 decodificar JSON
     
     foreach ($registros as &$r) {
         if (isset($r['usuarios_refeicoes'])) {
             $r['usuarios_refeicoes'] = json_decode($r['usuarios_refeicoes'], true);
-            $r['usuarios_refeicoes'] = $r['usuarios_refeicoes'][$id];
+            if( isset($r['usuarios_refeicoes'][$id]) ) $r['usuarios_refeicoes'] = $r['usuarios_refeicoes'][$id];
+            else $r['usuarios_refeicoes'] = "B";
         }
     }
 
