@@ -23,10 +23,10 @@
         <table>
           <thead>
             <tr>
-              <th>Dia</th>
-              <th>Café</th>
-              <th>Almoço</th>
-              <th>Janta</th>
+              <th class="r_dia">Dia</th>
+              <th class="r_cafe">Café</th>
+              <th class="r_almoco">Almoço</th>
+              <th class="r_janta">Janta</th>
             </tr>
           </thead>
           <tbody id="tabela-semanal"></tbody>

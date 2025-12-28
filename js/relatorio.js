@@ -33,14 +33,6 @@ document.addEventListener('DOMContentLoaded', function() {
   
 });
 
-$om_id = 1;
-$responsavel_id = 1;
-const ranchos = [
-  {"nome" : "Oficiais", "patente" : ["CEL", "TEN-CEL", "MAJ", "CAP", "1º TEN", "2º TEN", "ASP", "ST"], "servico" : 1 },
-  {"nome" : "Sargentos", "patente" : ["1º SGT", "2º SGT", "3º SGT", "SC"], "servico" : 2 },
-  {"nome" : "Cbs / Sds", "patente" : ["CB", "SD EP", "SD EV"], "servico" : 18 }
-];
-
 const hoje = agora();
 const dataAtualStr = [
   hoje.getFullYear(),
@@ -264,6 +256,11 @@ function renderArranchamentoDia() {
 
   // cria mapa patente -> rancho
   const mapaPatenteRancho = {};
+  /*const ranchos = [
+    {"nome" : "Oficiais", "patente" : ["CEL", "TEN-CEL", "MAJ", "CAP", "1º TEN", "2º TEN", "ASP", "ST"], "servico" : 1 },
+    {"nome" : "Sargentos", "patente" : ["1º SGT", "2º SGT", "3º SGT", "SC"], "servico" : 2 },
+    {"nome" : "Cbs / Sds", "patente" : ["CB", "SD EP", "SD EV"], "servico" : 18 }
+  ];*/
   ranchos.forEach(r => {
     totais.t_rancho[r.nome] = { t_c: 0, t_a: 0, t_j: 0, t_s: r.servico };
     totais.t_s += r.servico;
@@ -274,6 +271,14 @@ function renderArranchamentoDia() {
 
   const tbody = document.getElementById('tabela-dia-body');
   tbody.innerHTML = '';
+
+  //filtrar usuarios que não estaoarranchados
+  const usuariosFiltrados = usuarios.filter(u => {
+    const refeicao = usuario_refeicoes[u.id] || '';
+    return ( refeicao.includes('C') || refeicao.includes('A') || refeicao.includes('J') );
+  });
+  console.log('usuariosFiltrados', usuariosFiltrados);
+  usuarios = usuariosFiltrados;
 
   // Percorre usuários em pares (esquerda/direita)
   for (let i = 0; i < usuarios.length; i += 2) {
@@ -351,7 +356,6 @@ function carregarArranchamento() {
         document.getElementById('chk-diferencas')?.click();
         exibir_mudancas();
       }
-
 
       /*
       spanNome.textContent = dados.nome;

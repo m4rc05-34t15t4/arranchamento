@@ -98,9 +98,6 @@ const mesMinimo = new Date(hoje.getFullYear(), hoje.getMonth() - 1, 1);
 let excecoes = {"semanal" : [], "diaria" : [], "manual" : {}};
 const arranchamento_relatorios = [];
 
-// ⚠️ ID do usuário logado (ideal vir da sessão)
-const ID_USUARIO = 2;
-
 const spanNome = document.getElementById('nome-usuario');
 const spanPatente = document.getElementById('patente-usuario');
 const spanOM = document.getElementById('om-usuario');
@@ -698,17 +695,11 @@ function limparDialog() {
 /* ================== USUÁRIO ================== */
 
 function carregarUsuario() {
-  fetch(`../api/get_usuario.php?id=${ID_USUARIO}`)
+  fetch(`../api/get_usuario.php?id=${$responsavel_id}`)
     .then(r => r.json())
     .then(dados => {
 
       console.log(dados);
-
-      /*
-      spanNome.textContent = dados.nome;
-      spanPatente.textContent = dados.patente;
-      spanOM.textContent = dados.sigla_om;
-      */
 
       carregarPadraoSemanal(dados.padrao_semanal);
 
@@ -754,7 +745,7 @@ function salvar() {
   }, {});
 
   const payload = {
-    id_usuario: ID_USUARIO,
+    id_usuario: $responsavel_id,
     padrao_semanal: padraoSemanal,
     excecoes: excecoes
   };

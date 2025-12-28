@@ -31,7 +31,7 @@
         p.nome AS patente,
         p.ordem AS ordem_patente, 
         o.nome_om,
-        o.sigla_om
+        o.sigla_om 
     FROM usuarios u
     JOIN patentes p ON p.id = u.id_patente
     JOIN om o ON o.id_om = u.id_om

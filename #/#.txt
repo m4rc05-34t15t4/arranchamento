@@ -210,3 +210,10 @@ ADD COLUMN excecao_manual JSONB;
 ALTER TABLE IF EXISTS public.relatorios
     ADD CONSTRAINT data_relatorio_om_unique UNIQUE (data_relatorio, id_om);
 
+
+ALTER TABLE IF EXISTS public.om
+    ADD COLUMN ranchos jsonb;
+
+ALTER TABLE IF EXISTS public.om
+    ADD COLUMN administradores integer[];
+

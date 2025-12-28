@@ -3,6 +3,12 @@
   $pagina = pathinfo($_SERVER['PHP_SELF'], PATHINFO_FILENAME);
   $om_id = $_SESSION['ARRANCHAMENTO']['om_id'];
   $id_usu = $_SESSION['ARRANCHAMENTO']['usuario_id'];
+  //Variaveis sessão para JS
+  echo '
+    <script> 
+      const $om_id = '.$om_id.';
+      const $responsavel_id = '.$id_usu.';
+    </script>';
 ?>
 <header class="topbar">
   <div class="left">
@@ -29,7 +35,7 @@
               $titulo = "Arranchamento";
               break;
           }
-          if($_SESSION['ARRANCHAMENTO']['administrador']) echo ' | <a href="" class="logout-link"> Config </a>'.$link;
+          echo $link;// if($_SESSION['ARRANCHAMENTO']['administrador']) echo ' | <a href="" class="logout-link"> Config </a>'.$link;
         ?>
       </div>
     </div>

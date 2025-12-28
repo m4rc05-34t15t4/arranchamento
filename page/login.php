@@ -19,13 +19,21 @@
 <div class="login-page">
   <div class="card login-card">
 
+   <?php
+      if (isset($_GET['id_om']) && $_GET['id_om'] !== '') {
+          $id_om = basename($_GET['id_om']);
+          $caminho_img = "../img/om/{$id_om}.png";
+          if (file_exists($caminho_img)) echo '<img src="'.$caminho_img.'" alt="Logo OM" class="logo-login">';
+      }
+    ?>
+
     <h1>Arranchamento</h1>
 
     <?php if (!empty($_GET['erro'])): ?>
       <div class="login-erro">Usuário ou senha inválidos</div>
     <?php endif; ?>
 
-    <form method="post" action="validar_login.php">
+    <form method="post" action="../api/validar_login.php">
       <label>Usuário</label>
       <input type="text" name="usuario" required>
 

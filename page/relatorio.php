@@ -1,4 +1,4 @@
-<?php $ts = time(); ?>
+<?php $ts = time();?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -18,6 +18,12 @@
     header('Location: arranchamento.php');
     exit;
   }
+  //Variaveis sessão para JS
+  echo '
+    <script> 
+      const ranchos = JSON.parse('.json_encode($_SESSION['ARRANCHAMENTO']['ranchos'] ?? null).'); 
+      console.log("ranchos", ranchos);
+    </script>';
 ?>
 
 <main class="pagina-dia">
