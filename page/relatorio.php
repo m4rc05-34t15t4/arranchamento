@@ -11,11 +11,30 @@
 
 <div class="watermark"><span>Previsão</span></div>
 
-<?php include 'header.php'; ?>
+<?php 
+  include 'header.php'; 
+  //Apenas para administradores
+  if (!$_SESSION['ARRANCHAMENTO']['administrador']) {
+    header('Location: arranchamento.php');
+    exit;
+  }
+?>
 
 <main class="pagina-dia">
 
-  <div class="tabelas-div">
+      <div class="tabelas-div">
+
+        <div id="cabecalho_impressao">
+          <img src="../img/om/<?=$om_id?>.png" alt="Logo" class="logo-impressao">
+
+          <div class="om-impressao">
+            <?php echo $_SESSION['ARRANCHAMENTO']['om_sigla']; ?>
+          </div>
+
+          <div class="responsavel-impressao">
+            <?php echo $_SESSION['ARRANCHAMENTO']['patente'] . ' ' . $_SESSION['ARRANCHAMENTO']['usuario_nome_guerra']; ?>
+          </div>
+        </div>
 
     <div id="titulo-arranchamento">
       <button id="btn-anterior" class="botao-menu">◀</button>

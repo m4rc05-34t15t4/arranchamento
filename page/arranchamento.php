@@ -10,8 +10,8 @@
 <body>
 
   <?php 
-    include_once 'header.php';
-    include_once 'load.php'; 
+    require_once 'header.php';
+    require_once 'load.php'; 
   ?>
 
   <div class="layout-arranchamento">
@@ -150,6 +150,6 @@
 
   </div>
 
-  <script src="../js/app.js?t=<?= $ts ?>"></script>
+  <script src="../js/arranchamento.js?t=<?= $ts ?>"></script>
 </body>
 </html>

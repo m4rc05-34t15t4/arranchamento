@@ -23,23 +23,55 @@ dialog { border:none; border-radius:8px; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
+  padding: 0 10px;
   background: var(--azul-principal);
   color: #fff;
   z-index: 1000;
 }
-.topbar .left { display:flex; align-items:center; gap:10px; }
+.topbar .left { 
+  display:flex; 
+  align-items: center; 
+  gap: 10px;
+  margin-left: 5px;
+}
 .topbar .center {
-  display: flex;
-  align-items: center;      /* centro vertical */
-  justify-content: center;  /* centro horizontal */
+  position: fixed;        /* 👈 fora do fluxo */
+  left: 50%;
+  top: 35px;              /* metade da altura */
+  transform: translate(-50%, -50%);
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;   /* opcional */
 }
 .topbar h1 {
   margin: 0;
   line-height: 1;
 }
-.logo { width:48px; height:48px; border-radius:50%; background:#fff; }
-.user-info { font-size:14px; }
+.logo { 
+  width:48px; 
+  height:48px; 
+  border-radius:50%;
+  border: solid 1px #CCC;
+  background:#fff;
+  object-fit: cover; 
+}
+.om-box {
+  display: flex;
+  flex-direction: row;     /* 👈 logo em cima, texto embaixo */
+  align-items: center;        /* 👈 centraliza horizontal */
+  justify-content: center;    /* 👈 centraliza vertical */
+  gap: 4px;                   /* 👈 espaçamento entre logo e texto */
+}
+.logo_om {
+  width: auto;                /* ajuste se quiser */
+  height: 48px;
+  margin: 0 5px 0 5px;
+}
+#om-usuario {
+  line-height: 1;
+}
+.user-info { font-size: 14px; }
+#nome-usuario { font-size: 18px; margin-bottom: 5px; display: block; }
 .quartel { font-size:20px; letter-spacing:1px; }
 .excecoes-header {
   display: flex;
@@ -529,6 +561,106 @@ border-left: 5px solid #1e88e5;
   transform: scale(1.15);
 }
 
+/* ===== LOGIN (AJUSTADO) ===== */
+
+.login-page {
+  height: calc(100vh - 100px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden; /* ❌ remove scroll */
+  background: #f4f6f8;
+  margin: 0;
+}
+
+.login-card {
+  width: 380px;
+  max-width: 90vw;
+  border-radius: 14px;
+  padding: 28px 26px;
+}
+
+/* Título */
+.login-card h1 {
+  text-align: center;
+  margin-bottom: 8px;
+  font-size: 1.6rem;
+}
+
+/* Subtítulo */
+.login-card p {
+  text-align: center;
+  font-size: 1.05rem;
+  color: #666;
+  margin-bottom: 24px;
+}
+
+/* Labels */
+.login-card label {
+  font-size: 1rem;
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* Inputs */
+.login-card input {
+  width: 100%;
+  padding: 10px;
+  font-size: 1.3rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: 18px;
+  box-sizing: border-box;
+}
+
+.login-card input:focus {
+  outline: none;
+  border-color: var(--azul-principal);
+}
+
+/* Botão */
+.login-card button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  background: var(--azul-principal);
+  color: #fff;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.login-card button:hover {
+  background: #166fc2;
+}
+
+/* Erro */
+.login-erro {
+  background: #fdecea;
+  color: #b71c1c;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.logout-link {
+  font-size: 1rem;
+  color: #e3f2fd;
+  text-decoration: none;
+  opacity: 0.85;
+}
+
+.logout-link:hover {
+  text-decoration: underline;
+  opacity: 1;
+}
+
+#cabecalho_impressao{
+  display: none;
+}
+
+
 @keyframes fadeBorder {
   0% {
     outline-color: rgba(255, 152, 0, 0);
@@ -705,6 +837,34 @@ border-left: 5px solid #1e88e5;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) rotate(-30deg);
+  }
+
+  #cabecalho_impressao {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;     /* 👈 centraliza horizontal */
+    justify-content: center;
+    text-align: center;
+  }
+
+  .logo-impressao {
+    width: 100px;             /* ajuste se quiser */
+    height: auto;
+    margin-bottom: 8px;
+  }
+
+  .om-impressao {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  .responsavel-impressao {
+    font-size: 18px;
+    font-style: italic;
+    color: #444;
   }
 
 }
