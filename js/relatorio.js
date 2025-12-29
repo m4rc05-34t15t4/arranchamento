@@ -30,6 +30,10 @@ document.addEventListener('DOMContentLoaded', function() {
     toggle_cadeado(btn, bloqueado);
     bloqueardia_arranchamento(btn, bloqueado);
   });
+  btnEditar.addEventListener('click', () => { preencher_modal_editar_ranchos(btnEditar, modal, lista); });
+  btnCancelar.addEventListener('click', () => { modal.classList.add('hidden'); });
+  btnSalvar.addEventListener('click', () => { salvar_ranchos_modal(lista, btnSalvar, modal); });
+  modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.add('hidden'); });  
   
 });
 
@@ -48,6 +52,65 @@ let usuarios = null;
 let existe_arranchamento = null;
 let houve_mudancas_arranchamento = false;
 const valor_refeicao = '✔️';
+let ranchosOriginal = [];
+const btnEditar = document.getElementById('bt-editar-ranchos');
+const modal = document.getElementById('modal-ranchos');
+const lista = document.getElementById('lista-ranchos');
+const btnCancelar = document.getElementById('bt-cancelar');
+const btnSalvar = document.getElementById('bt-salvar');
+
+function salvar_ranchos_modal(lista, btnSalvar, modal){
+  const inputs = lista.querySelectorAll('input');
+  inputs.forEach(input => {
+    const i = input.dataset.index;
+    ranchosOriginal[i].servico = parseInt(input.value) || 0;
+  });
+  btnSalvar.disabled = true;
+  const textoOriginal = btnSalvar.textContent;
+  btnSalvar.textContent = 'Salvando...';
+  const payload = {
+    acao: 'salvar_ranchos',
+    id_om: $om_id,                 // vindo do PHP
+    ranchos: ranchosOriginal       // dicionário atualizado
+  };
+  fetch('../api/salvar_om.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(res => {
+    if (!res.ok) throw new Error('Erro na API');
+    return res.json();
+  })
+  .then(resp => {
+    if (resp.status === 'ok') {
+      alert('Ranchos salvos com sucesso!');
+      modal.classList.add('hidden'); // fecha modal
+      //btnEditar.setAttribute('ranchos', JSON.stringify(ranchosOriginal));
+      window.location.reload();
+    } else alert(resp.mensagem || 'Erro ao salvar ranchos');
+  })
+  .catch(err => {
+    console.error(err);
+    alert('Erro de comunicação com o servidor');
+  })
+  .finally(() => {
+    btnSalvar.disabled = false;
+    btnSalvar.textContent = textoOriginal;
+  });
+}
+
+function preencher_modal_editar_ranchos(btnEditar, modal, lista){
+  ranchosOriginal = JSON.parse(btnEditar.getAttribute('ranchos'));
+  lista.innerHTML = '';
+  ranchosOriginal.forEach((rancho, index) => {
+    const div = document.createElement('div');
+    div.className = 'rancho-item';
+    div.innerHTML = `<label>${rancho.nome}</label><input type="number" min="0" value="${rancho.servico}" data-index="${index}">`;
+    lista.appendChild(div);
+  });
+  modal.classList.remove('hidden');
+}
 
 function exibir_mudancas() {
   const check_mudancas = document.getElementById('chk-diferencas');
@@ -326,6 +389,7 @@ function renderArranchamentoDia() {
   const tbody_rancho = document.getElementById('resumo-por-rancho');
   tbody_rancho.innerHTML = '';
 
+  document.getElementById('bt-editar-ranchos').setAttribute('ranchos', JSON.stringify(ranchos));
   ranchos.forEach(r => {
     const tr = document.createElement('tr');
     tr.innerHTML = `

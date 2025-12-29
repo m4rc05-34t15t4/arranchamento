@@ -1,5 +1,6 @@
 :root {
   --azul-principal: #1e88e5;
+  --azul-principal-escuro: #1a77c9;
   --azul-claro: #9ec9ff;
 }
 body { font-family: Arial, sans-serif; background:#f4f6f8; margin:0; padding:20px; padding-top: 40px; }
@@ -455,7 +456,7 @@ border-left: 5px solid #1e88e5;
 
 /* ligado */
 #chk-diferencas:checked + .slider {
-  background: #02a66a;
+  background: var(--azul-principal);
 }
 
 #chk-diferencas:checked + .slider::before {
@@ -483,14 +484,14 @@ border-left: 5px solid #1e88e5;
   padding: 10px 18px;
   border: none;
   border-radius: 6px;
-  background: #02a66a;
+  background: var(--azul-principal);
   color: #fff;
   font-weight: 600;
   cursor: pointer;
   font-size: 20px;
 }
 .btn-gerar:hover, .btn-imprimir:hover {
-  background: #017e4e;
+  background: var(--azul-principal-escuro);
 }
 
 .btn-gerar:disabled {
@@ -670,13 +671,135 @@ border-left: 5px solid #1e88e5;
 }
 
 .logo-login {
-    display: block;
-    margin: 0 auto;
-    width: 100px;             /* ajuste se quiser */
-    height: auto;
-    margin-bottom: 8px;
-  }
+  display: block;
+  margin: 0 auto;
+  width: 100px;             /* ajuste se quiser */
+  height: auto;
+  margin-bottom: 8px;
+}
 
+.titulo-rancho {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.titulo-rancho h4 {
+  margin: 0;
+}
+
+/* modal editar ranchos */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  cursor: pointer;
+}
+
+.modal:not(.hidden) {
+  display: flex;
+}
+
+.modal-box {
+  background: #fff;
+  width: 380px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+}
+
+/* 🔹 Cabeçalho */
+.modal-header {
+  background: var(--azul-principal);
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+  margin-bottom: 0;
+  color: #fff;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-weight: 600;
+}
+
+/* 🔹 Corpo */
+.modal-body {
+  padding: 14px 16px;
+}
+
+.rancho-item {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 50% / 50% */
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.rancho-item label {
+  font-weight: 400; /* normal */
+  font-size: 18px;
+  text-align: end;
+  padding-right: 20px;
+}
+
+/* 🔹 Input compacto */
+.rancho-item input {
+  width: 70px;
+  height: 28px;
+  text-align: center;
+  font-size: 18px;
+  margin-right: 20px;
+}
+
+/* 🔹 Rodapé */
+.modal-footer {
+  background: #f5f6f7;
+  padding: 10px 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  border-top: 1px solid #ddd;
+}
+
+.btn-salvar {
+  background: var(--azul-principal);
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  min-width: 100px;
+}
+
+.btn-cancelar {
+  background: #ccc;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  min-width: 100px;
+}
+
+.btn-salvar:hover {
+  background: var(--azul-principal-escuro);
+}
+
+.btn-cancelar:hover {
+  background: #b5b5b5;
+}
+
+#assinatura_impressao {
+  display: none;
+}
 
 @keyframes fadeBorder {
   0% {
@@ -706,6 +829,36 @@ border-left: 5px solid #1e88e5;
 }
 
 @media print {
+
+  /* assinatura impressao */
+
+  #assinatura_impressao {
+    display: block;
+    width: 100%;
+    margin-top: 30px;
+  }
+
+  .tabela-assinatura {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed; /* força colunas iguais */
+  }
+
+  .tabela-assinatura th,
+  .tabela-assinatura td {
+    border: 1px solid #CCC;
+    text-align: center;
+  }
+
+  .tabela-assinatura th {
+    padding: 16px;
+    font-size: 16px;
+  }
+
+  .assinatura-box {
+    min-height: 100px;   /* agora sim é respeitado */
+    width: 100%;
+  }
 
   /* remove margens padrão */
   @page {

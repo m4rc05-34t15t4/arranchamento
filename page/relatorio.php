@@ -28,19 +28,17 @@
 
 <main class="pagina-dia">
 
-      <div class="tabelas-div">
+  <div class="tabelas-div">
 
-        <div id="cabecalho_impressao">
-          <img src="../img/om/<?=$om_id?>.png" alt="Logo" class="logo-impressao">
-
-          <div class="om-impressao">
-            <?php echo $_SESSION['ARRANCHAMENTO']['om_sigla']; ?>
-          </div>
-
-          <div class="responsavel-impressao">
-            <?php echo $_SESSION['ARRANCHAMENTO']['patente'] . ' ' . $_SESSION['ARRANCHAMENTO']['usuario_nome_guerra']; ?>
-          </div>
-        </div>
+    <div id="cabecalho_impressao">
+      <img src="../img/om/<?=$om_id?>.png" alt="Logo" class="logo-impressao">
+      <div class="om-impressao">
+        <?php echo $_SESSION['ARRANCHAMENTO']['om_sigla']; ?>
+      </div>
+      <div class="responsavel-impressao">
+        <?php echo $_SESSION['ARRANCHAMENTO']['patente'] . ' ' . $_SESSION['ARRANCHAMENTO']['usuario_nome_guerra']; ?>
+      </div>
+    </div>
 
     <div id="titulo-arranchamento">
       <button id="btn-anterior" class="botao-menu">◀</button>
@@ -115,7 +113,10 @@
 
         <!-- Totais por rancho -->
         <div class="resumo-card">
-          <h4>Rancho</h4>
+          <div class="titulo-rancho">
+            <h4>Rancho</h4>
+            <button id="bt-editar-ranchos" class="btn-icon editar" title="Editar Ranchos" ranchos="">✏️</button>
+          </div>
           <table>
             <thead>
               <tr>
@@ -145,11 +146,45 @@
             <tbody id="resumo-por-posto"></tbody>
           </table>
         </div>
+      </div>
+    </div>
 
+    <div id="assinatura_impressao">
+      <table class="tabela-assinatura">
+        <thead>
+          <tr>
+            <th>Furriel</th>
+            <th>Cmt SU</th>
+            <th>Fiscal Administrativo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="assinatura-box"></div></td>
+            <td><div class="assinatura-box"></div></td>
+            <td><div class="assinatura-box"></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <div id="modal-ranchos" class="modal hidden">
+    <div class="modal-box">
+
+      <div class="modal-header">
+        <h2>Editar pessoal de serviço</h2>
+      </div>
+
+      <div class="modal-body" id="lista-ranchos"></div>
+
+      <div class="modal-footer">
+        <button id="bt-cancelar" class="btn-cancelar">Cancelar</button>
+        <button id="bt-salvar" class="btn-salvar">Salvar</button>
       </div>
 
     </div>
-
   </div>
 
 </main>
