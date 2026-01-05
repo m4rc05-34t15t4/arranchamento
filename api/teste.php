@@ -20,14 +20,14 @@
 
     //VAR_DUMP($_SESSION['ARRANCHAMENTO']);
 
-    /*$senha_plana = '123456'; // <<< TROQUE AQUI PELA SENHA REAL
+    $senha_plana = '3cgeo'; // <<< TROQUE AQUI PELA SENHA REAL
 
     $hash = password_hash($senha_plana, PASSWORD_DEFAULT);
 
     echo "<pre>";
     echo "Senha original: {$senha_plana}\n\n";
     echo "Hash para salvar no banco:\n{$hash}\n";
-    echo "</pre>";*/
+    echo "</pre>";
 
 
 ?>

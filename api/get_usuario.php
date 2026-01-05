@@ -50,17 +50,19 @@
 
     // 🔄 decodificar JSON
     
-    foreach ($registros as &$r) {
-        if (isset($r['usuarios_refeicoes'])) {
-            $r['usuarios_refeicoes'] = json_decode($r['usuarios_refeicoes'], true);
-            if( isset($r['usuarios_refeicoes'][$id]) ) $r['usuarios_refeicoes'] = $r['usuarios_refeicoes'][$id];
-            else $r['usuarios_refeicoes'] = "B";
+    if($registros){
+        foreach ($registros as &$r) {
+            if (isset($r['usuarios_refeicoes'])) {
+                $r['usuarios_refeicoes'] = json_decode($r['usuarios_refeicoes'], true);
+                if( isset($r['usuarios_refeicoes'][$id]) ) $r['usuarios_refeicoes'] = $r['usuarios_refeicoes'][$id];
+                else $r['usuarios_refeicoes'] = "B";
+            }
         }
     }
 
     echo json_encode([
         'id'              => $usuario['id'],
-        'nome'            => $usuario['nome_guerra'],
+        'nome'            => $usuario['nome_guerra'] ?? $usuario['nome_completo'],
         'nome_completo'   => $usuario['nome_completo'],
         'patente'         => $usuario['patente'],
         'om'              => $usuario['nome_om'],

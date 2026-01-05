@@ -65,7 +65,7 @@
     $_SESSION['ARRANCHAMENTO'] = [
         'usuario_id'           => $u['id'],
         'usuario_nome'         => $u['nome_completo'],
-        'usuario_nome_guerra'  => $u['nome_guerra'],
+        'usuario_nome_guerra'  => $u['nome_guerra'] ?? $u['nome_completo'],
         'patente'              => $u['patente'],
         'administrador'        => $u['administrador'] == 1,
         'om_id'                => $u['id_om'],

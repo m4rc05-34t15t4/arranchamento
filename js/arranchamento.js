@@ -699,7 +699,7 @@ function carregarUsuario() {
     .then(r => r.json())
     .then(dados => {
 
-      console.log(dados);
+      console.log('Dados:', dados);
 
       carregarPadraoSemanal(dados.padrao_semanal);
 
@@ -708,7 +708,7 @@ function carregarUsuario() {
       excecoes["manual"] = dados.excecao_manual && !Array.isArray(dados.excecao_manual) ? dados.excecao_manual : {};
       
       arranchamento_relatorios.length = 0;
-      dados.arranchamentos_relatorios.forEach(e => arranchamento_relatorios.push(e));
+      if(dados.arranchamentos_relatorios) dados.arranchamentos_relatorios.forEach(e => arranchamento_relatorios.push(e));
          
       renderExcecoes();
       renderSimulacao();

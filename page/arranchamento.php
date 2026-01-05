@@ -150,6 +150,8 @@
 
   </div>
 
+  <?php include 'footer.php'; ?>
+
   <script src="../js/arranchamento.js?t=<?= $ts ?>"></script>
 </body>
 </html>

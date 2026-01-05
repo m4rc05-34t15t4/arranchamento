@@ -156,7 +156,7 @@ function processaUsuario(usuario, usuario_refeicoes, totais, mapaPatenteRancho) 
 
 function texto_table_dupla(uEsq, uEsq_r, existe_arranchamento){
   if(uEsq){
-    texto = `<td class="t_dia_nome" id_usuario="${uEsq.id}">${uEsq ? `${uEsq.patente} ${uEsq.nome_guerra}` : ''}</td>`;
+    texto = `<td class="t_dia_nome" id_usuario="${uEsq.id}" title="${uEsq.nome_completo}">${uEsq ? `${uEsq.patente} ${uEsq.nome_guerra ?? uEsq.nome_completo}` : ''}</td>`;
     ['cafe', 'almoco', 'janta'].forEach((valor, index) => {
       dif = 'n';
       if( uEsq['relatorio_previsao_CAJ'][index] != uEsq_r[index] ) {
@@ -212,12 +212,14 @@ function gerarSiglaUsuario(usuario, dataObj) {
   // 2️⃣ EXCEÇÃO DIÁRIA
   if (excecaoDiaria[dataISO]) return normalizarSigla(excecaoDiaria[dataISO]);
   // 3️⃣ EXCEÇÃO SEMANAL
-  for (const e of excecaoSemanal) {
-    const inicio = new Date(e.inicio + 'T00:00:00');
-    const fim    = new Date(e.fim + 'T23:59:59');
-    if (data >= inicio && data <= fim) {
-      const sigla = e.configuracao?.[diaSemana];
-      if (sigla !== undefined) return normalizarSigla(sigla);
+  if(excecaoSemanal.length > 0){
+    for (const e of excecaoSemanal) {
+      const inicio = new Date(e.inicio + 'T00:00:00');
+      const fim    = new Date(e.fim + 'T23:59:59');
+      if (data >= inicio && data <= fim) {
+        const sigla = e.configuracao?.[diaSemana];
+        if (sigla !== undefined) return normalizarSigla(sigla);
+      }
     }
   }
   // 4️⃣ PADRÃO SEMANAL
@@ -341,7 +343,7 @@ function renderArranchamentoDia() {
     return ( refeicao.includes('C') || refeicao.includes('A') || refeicao.includes('J') );
   });
   console.log('usuariosFiltrados', usuariosFiltrados);
-  usuarios = usuariosFiltrados;
+  //usuarios = usuariosFiltrados; //Exibir apenas com arranchamento
 
   // Percorre usuários em pares (esquerda/direita)
   for (let i = 0; i < usuarios.length; i += 2) {
@@ -409,7 +411,7 @@ function carregarArranchamento() {
     .then(r => r.json())
     .then(dados => {
 
-      console.log(dados);
+      console.log('Dados', dados);
       relatorios = dados.relatorios;
       usuarios = dados.usuarios;
 

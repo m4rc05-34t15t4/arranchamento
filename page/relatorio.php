@@ -65,22 +65,22 @@
 
     <div class="tabelas-duplas resumo-card">
 
-    <table class="tabela-dia">
-      <thead>
-        <tr>
-          <th class="t_dia_nome">Nome</th>
-          <th class="t_dia_refeicao">Café</th>
-          <th class="t_dia_refeicao">Almoço</th>
-          <th class="t_dia_refeicao">Janta</th>
-          <th></th>
-          <th class="t_dia_nome">Nome</th>
-          <th class="t_dia_refeicao">Café</th>
-          <th class="t_dia_refeicao">Almoço</th>
-          <th class="t_dia_refeicao">Janta</th>
-        </tr>
-      </thead>
-      <tbody id="tabela-dia-body"></tbody>
-    </table>
+      <table class="tabela-dia">
+        <thead>
+          <tr>
+            <th class="t_dia_nome">Nome</th>
+            <th class="t_dia_refeicao">Café</th>
+            <th class="t_dia_refeicao">Almoço</th>
+            <th class="t_dia_refeicao">Janta</th>
+            <th></th>
+            <th class="t_dia_nome">Nome</th>
+            <th class="t_dia_refeicao">Café</th>
+            <th class="t_dia_refeicao">Almoço</th>
+            <th class="t_dia_refeicao">Janta</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-dia-body"></tbody>
+      </table>
 
     </div>
 
@@ -188,6 +188,8 @@
   </div>
 
 </main>
+
+<?php include 'footer.php'; ?>
 
 <script src="../js/relatorio.js?t=<?= $ts ?>"></script>
 </body>
