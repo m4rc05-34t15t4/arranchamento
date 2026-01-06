@@ -30,6 +30,11 @@ document.addEventListener('DOMContentLoaded', function() {
     toggle_cadeado(btn, bloqueado);
     bloqueardia_arranchamento(btn, bloqueado);
   });
+  document.getElementById('btnExcluirRelatorio').addEventListener('click', () => {
+    const confirmado = confirm(`Você realmente deseja apagar arrachamento do dia: ${formatarDataISO_BR(dataArranchamento)}?`);
+    if (!confirmado) return;
+    apagar_arranchamento();
+  });
   btnEditar.addEventListener('click', () => { preencher_modal_editar_ranchos(btnEditar, modal, lista); });
   btnCancelar.addEventListener('click', () => { modal.classList.add('hidden'); });
   btnSalvar.addEventListener('click', () => { salvar_ranchos_modal(lista, btnSalvar, modal); });
@@ -280,6 +285,7 @@ function renderArranchamentoDia() {
     dt_atu.style.display = 'block';
     document.getElementById('checkbox-exibir-mudancas').style.display = 'flex';
     document.getElementById('btnImprimirArranchamento').style.display = 'block';
+    document.getElementById('btnExcluirRelatorio').style.display = 'block';
     if(relatorios['usuarios_refeicoes'] == '{}') toggle_cadeado();
   }
   else Definir_previsao(); //if( nova_datahora(dia) < nova_datahora(dataAtualStr) ) window.location.href = `?dia=${dataAtualStr}`;
@@ -343,7 +349,7 @@ function renderArranchamentoDia() {
     return ( refeicao.includes('C') || refeicao.includes('A') || refeicao.includes('J') );
   });
   console.log('usuariosFiltrados', usuariosFiltrados);
-  //usuarios = usuariosFiltrados; //Exibir apenas com arranchamento
+  usuarios = usuariosFiltrados; //Exibir apenas com arranchamento
 
   // Percorre usuários em pares (esquerda/direita)
   for (let i = 0; i < usuarios.length; i += 2) {
@@ -549,6 +555,39 @@ function bloqueardia_arranchamento(btn, bloqueado_antes) {
   .then(resp => {
     if (resp.status === 'ok') window.location.reload();
     else alert(resp.mensagem || 'Erro ao salvar arranchamento');
+  })
+  .catch(err => {
+    console.error(err);
+    alert('Erro de comunicação com o servidor');
+  })
+  .finally(() => {
+    btn.disabled = false;
+  });
+}
+
+function apagar_arranchamento() {
+  if(!existe_arranchamento) return;
+  btn = document.getElementById('btnExcluirRelatorio');
+  btn.disabled = true;
+  const payload = {
+    acao: 'deletar',
+    data_relatorio: formatarDataISO_BR(dataArranchamento),
+    id_om: $om_id,
+    id_responsavel: $responsavel_id
+  };
+  //console.log(payload); return;
+  fetch('../api/salvar_arranchamento_dia.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(res => {
+    if (!res.ok) throw new Error('Erro na API');
+    return res.json();
+  })
+  .then(resp => {
+    if (resp.status === 'ok') window.location.reload();
+    else alert(resp.mensagem || 'Erro ao deletar arranchamento');
   })
   .catch(err => {
     console.error(err);

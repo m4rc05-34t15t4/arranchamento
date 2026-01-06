@@ -43,10 +43,13 @@
     <div id="titulo-arranchamento">
       <button id="btn-anterior" class="botao-menu">◀</button>
       <div class="titulo-centro">
-        <h2 id="data-atual"></h2>
-        <h5 id="data-atualizacao"></h5>
+        <div class="titulo-centro-h">
+          <h2 id="data-atual"></h2>
+          <h5 id="data-atualizacao"></h5>
+        </div>
         <div class="acoes-arranchamento">
           <button id="btnBloquearDia" class="btn-cadeado aberto" title="Dia aberto">🔓</button>
+          <button id="btnExcluirRelatorio" class="btn-lixeira apagado" title="Apagar relatório"> 🗑️ </button>
           <div id="checkbox-exibir-mudancas" class="toggle-switch">
             <input type="checkbox" id="chk-diferencas">
             <label for="chk-diferencas" class="slider"></label>

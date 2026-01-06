@@ -551,7 +551,11 @@ border-left: 5px solid #1e88e5;
   padding: 4px;
 }
 
-.btn-cadeado {
+.btn-lixeira{
+  display: none;
+}
+
+.btn-cadeado, .btn-lixeira {
   background: none;
   border: none;
   cursor: pointer;
@@ -560,7 +564,7 @@ border-left: 5px solid #1e88e5;
   transition: transform 0.2s, opacity 0.2s;
 }
 
-.btn-cadeado.aberto {
+.btn-cadeado.aberto, .btn-lixeira.apagado {
   opacity: 0.3;
   color: #666;
 }
@@ -570,8 +574,12 @@ border-left: 5px solid #1e88e5;
   color: #d9534f; /* vermelho */
 }
 
-.btn-cadeado:hover {
+.btn-cadeado:hover, .btn-lixeira:hover {
   transform: scale(1.15);
+}
+
+.btn-lixeira:hover {
+  opacity: 1;
 }
 
 /* ===== LOGIN (AJUSTADO) ===== */
@@ -821,6 +829,13 @@ border-left: 5px solid #1e88e5;
   flex-wrap: wrap;
 }
 
+.titulo-centro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;   /* centraliza horizontalmente */
+  justify-content: center;
+}
+
 @keyframes fadeBorder {
   0% {
     outline-color: rgba(255, 152, 0, 0);
@@ -859,7 +874,7 @@ border-left: 5px solid #1e88e5;
     text-align: center;
     page-break-after: avoid !important;
     page-break-inside: avoid !important;
-    margin: 30px 0 6px 0 !important;
+    margin: 20px 0 6px 0 !important;
     padding: 0 !important;
   }
 
@@ -876,12 +891,12 @@ border-left: 5px solid #1e88e5;
   }
 
   .tabela-assinatura th {
-    padding: 16px;
+    padding: 10px;
     font-size: 16px;
   }
 
   .assinatura-box {
-    min-height: 100px;   /* agora sim é respeitado */
+    min-height: 80px;   /* agora sim é respeitado */
     width: 100%;
   }
 
@@ -895,6 +910,7 @@ border-left: 5px solid #1e88e5;
     background: #fff !important;
     color: #000 !important;
     font-size: 11px;
+    margin-bottom: 50px !important; /* espaço reservado para o rodapé */
   }
 
   .pagina-dia{
@@ -956,6 +972,7 @@ border-left: 5px solid #1e88e5;
     border: 1px solid #000;
     padding: 4px 6px;
     text-align: center;
+    font-size: 13px;
   }
 
   th.t_dia_nome,
@@ -980,7 +997,8 @@ border-left: 5px solid #1e88e5;
   }
 
   #data-atual, #data-atualizacao{
-    font-size: 24px;
+    font-size: 18px;
+    text-align: center;
   }
 
   #data-atual {
@@ -1095,6 +1113,16 @@ border-left: 5px solid #1e88e5;
   .titulo-centro {
     display: block !important;
     text-align: center;
+  }
+
+  .rodape {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    margin: 0;
+    background: #fff; /* evita fundo cinza na impressão */
+    border-top: none;
   }
 
 }
