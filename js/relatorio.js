@@ -290,15 +290,20 @@ function renderArranchamentoDia() {
   }
   else Definir_previsao(); //if( nova_datahora(dia) < nova_datahora(dataAtualStr) ) window.location.href = `?dia=${dataAtualStr}`;
 
-  const dt_atual = document.getElementById('data-atual');
-  dt_atual.setAttribute('data-ref', dataArranchamento.toISOString().slice(0, 10));
-  dt_atual.textContent = `${text_titulo} ${
+  $txt_data = `${text_titulo} ${
     dataArranchamento.toLocaleDateString('pt-BR', {
       weekday: 'long',
       day: '2-digit',
       month: '2-digit',
       year: 'numeric'
     })}`;
+  const dt_atual = document.getElementById('data-atual');
+  dt_atual.setAttribute('data-ref', dataArranchamento.toISOString().slice(0, 10));
+  dt_atual.textContent = $txt_data;
+
+  //Titulo
+  let diaSemana = dataArranchamento.toLocaleDateString('pt-BR', { weekday: 'short' }).toUpperCase().replace('.', '');
+  document.title = `Arranchamento_${dataArranchamento.toISOString().split('T')[0]} _${diaSemana}`;
 
   //criar previsão com base no padrão atual do usuario
   usuario_previsao = {};
@@ -373,7 +378,7 @@ function renderArranchamentoDia() {
   console.log('totais', totais);
 
   // preencher totais gerais
-  document.getElementById('total-cafe').textContent = totais['t_c'] + totais['t_s'];
+  document.getElementById('total-cafe').textContent = totais['t_c'] + (totais['t_s'] * 2);
   document.getElementById('total-almoco').textContent = totais['t_a'] + totais['t_s'];
   document.getElementById('total-janta').textContent = totais['t_j'] + totais['t_s'];
   document.getElementById('total-servico').textContent = totais['t_s'];

@@ -28,6 +28,7 @@
         u.excecao_semanal,
         u.excecao_diaria,
         u.excecao_manual,
+        u.ativo,
         p.nome AS patente,
         p.ordem AS ordem_patente, 
         o.nome_om,
@@ -35,7 +36,7 @@
     FROM usuarios u
     JOIN patentes p ON p.id = u.id_patente
     JOIN om o ON o.id_om = u.id_om
-    WHERE u.id_om = $om 
+    WHERE u.id_om = $om AND u.ativo = TRUE 
     order by ordem_patente desc, nome_guerra;";
     $r = executeQuery($sql);
     if ( $r["success"] && count($r["data"]) > 0 ) $usuarios = $r["data"];
