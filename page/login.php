@@ -34,7 +34,7 @@
     <?php endif; ?>
 
     <form method="post" action="../api/validar_login.php">
-      <label>Usuário</label>
+      <label>Usuário ( IDT MIL / CPF )</label>
       <input type="text" name="usuario" required>
 
       <label>Senha</label>
