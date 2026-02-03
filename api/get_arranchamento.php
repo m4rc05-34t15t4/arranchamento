@@ -41,8 +41,15 @@
     $r = executeQuery($sql);
     if ( $r["success"] && count($r["data"]) > 0 ) $usuarios = $r["data"];
 
+    //quantidade
+    $total_ativos = null;
+    $sql = "select count(id) from usuarios where ativo = true;";
+    $r = executeQuery($sql);
+    if ( $r["success"] && count($r["data"]) > 0 && $r["data"][0] && $r["data"][0]['count']) $total_ativos = $r["data"][0]['count'];
+
     echo json_encode([
         'relatorios' => $relatorios,
-        'usuarios'   => $usuarios
+        'usuarios'   => $usuarios,
+        'total_ativos' => $total_ativos
     ]);
 ?>

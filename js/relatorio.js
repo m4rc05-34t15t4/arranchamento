@@ -54,6 +54,7 @@ const exb_mud = params.get('exibir_mudancas') || 's';
 let dataArranchamento = nova_datahora(dia); //agora();
 let relatorios = null;
 let usuarios = null;
+let total_ativos = null;
 let existe_arranchamento = null;
 let houve_mudancas_arranchamento = false;
 const valor_refeicao = '✔️';
@@ -376,12 +377,18 @@ function renderArranchamentoDia() {
 
   //totais
   console.log('totais', totais);
+  console.log('total_ativos', total_ativos);
+
+  let t_cafe_final = totais['t_c'] + (totais['t_s'] * 2);
+  let t_almoco_final = totais['t_a'] + totais['t_s'];
+  let t_janta_final = totais['t_j'] + totais['t_s'];
+  let t_servico_final = totais['t_s'];
 
   // preencher totais gerais
-  document.getElementById('total-cafe').textContent = totais['t_c'] + (totais['t_s'] * 2);
-  document.getElementById('total-almoco').textContent = totais['t_a'] + totais['t_s'];
-  document.getElementById('total-janta').textContent = totais['t_j'] + totais['t_s'];
-  document.getElementById('total-servico').textContent = totais['t_s'];
+  document.getElementById('total-cafe').textContent = t_cafe_final > total_ativos ? total_ativos : t_cafe_final;
+  document.getElementById('total-almoco').textContent = t_almoco_final > total_ativos ? total_ativos : t_almoco_final;
+  document.getElementById('total-janta').textContent = t_janta_final > total_ativos ? total_ativos : t_janta_final;
+  document.getElementById('total-servico').textContent = t_servico_final > total_ativos ? total_ativos : t_servico_final;
 
   // preencher tabela por patente
   const tbody_rt = document.getElementById('resumo-por-posto');
@@ -425,6 +432,7 @@ function carregarArranchamento() {
       console.log('Dados', dados);
       relatorios = dados.relatorios;
       usuarios = dados.usuarios;
+      total_ativos = parseInt(dados.total_ativos);
 
       renderArranchamentoDia();
 
