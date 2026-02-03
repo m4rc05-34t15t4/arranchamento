@@ -421,6 +421,8 @@ function renderArranchamentoDia() {
     `;
     tbody_rancho.appendChild(tr);
   });
+  t_servico_final
+
 }
 
 function carregarArranchamento() {
