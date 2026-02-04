@@ -43,9 +43,29 @@
 
     //quantidade
     $total_ativos = null;
-    $sql = "select count(id) from usuarios where ativo = true;";
+    $sql = "SELECT 
+            COALESCE(r.rancho_info->>'nome', 'total_geral') AS rancho,
+            COUNT(u.id) AS total_ativos
+        FROM 
+            om o
+        CROSS JOIN LATERAL 
+            jsonb_array_elements(o.ranchos) AS r(rancho_info)
+        LEFT JOIN 
+            patentes p ON r.rancho_info->'patente' ? p.nome
+        LEFT JOIN 
+            usuarios u ON u.id_patente = p.id 
+            AND u.id_om = o.id_om 
+            AND u.ativo = true
+        WHERE 
+            o.id_om = 1
+        GROUP BY 
+            ROLLUP(r.rancho_info->>'nome')
+        ORDER BY 
+            (r.rancho_info->>'nome' IS NULL), -- Garante que o TOTAL GERAL fique por último
+            total_ativos DESC;
+        ";
     $r = executeQuery($sql);
-    if ( $r["success"] && count($r["data"]) > 0 && $r["data"][0] && $r["data"][0]['count']) $total_ativos = $r["data"][0]['count'];
+    if ( $r["success"] && count($r["data"]) > 0 ) $total_ativos = array_column($r["data"], null, 'rancho');;
 
     echo json_encode([
         'relatorios' => $relatorios,

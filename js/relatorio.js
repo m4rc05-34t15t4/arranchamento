@@ -64,6 +64,10 @@ const modal = document.getElementById('modal-ranchos');
 const lista = document.getElementById('lista-ranchos');
 const btnCancelar = document.getElementById('bt-cancelar');
 const btnSalvar = document.getElementById('bt-salvar');
+const exibir_pessoal_nao_arranchado = false;
+
+
+// Funções
 
 function salvar_ranchos_modal(lista, btnSalvar, modal){
   const inputs = lista.querySelectorAll('input');
@@ -352,7 +356,7 @@ function renderArranchamentoDia() {
   //filtrar usuarios que não estaoarranchados
   const usuariosFiltrados = usuarios.filter(u => {
     const refeicao = usuario_refeicoes[u.id] || '';
-    return ( refeicao.includes('C') || refeicao.includes('A') || refeicao.includes('J') );
+    return ( refeicao.includes('C') || refeicao.includes('A') || refeicao.includes('J') || exibir_pessoal_nao_arranchado);
   });
   console.log('usuariosFiltrados', usuariosFiltrados);
   usuarios = usuariosFiltrados; //Exibir apenas com arranchamento
@@ -375,20 +379,15 @@ function renderArranchamentoDia() {
     tbody.appendChild(tr);
   }
 
+  gerar_tabelas_quantidades(ordem_patentes_arr, totais);
+
+}
+
+function gerar_tabelas_quantidades(ordem_patentes_arr, totais) {
+
   //totais
   console.log('totais', totais);
   console.log('total_ativos', total_ativos);
-
-  let t_cafe_final = totais['t_c'] + (totais['t_s'] * 2);
-  let t_almoco_final = totais['t_a'] + totais['t_s'];
-  let t_janta_final = totais['t_j'] + totais['t_s'];
-  let t_servico_final = totais['t_s'];
-
-  // preencher totais gerais
-  document.getElementById('total-cafe').textContent = t_cafe_final > total_ativos ? total_ativos : t_cafe_final;
-  document.getElementById('total-almoco').textContent = t_almoco_final > total_ativos ? total_ativos : t_almoco_final;
-  document.getElementById('total-janta').textContent = t_janta_final > total_ativos ? total_ativos : t_janta_final;
-  document.getElementById('total-servico').textContent = t_servico_final > total_ativos ? total_ativos : t_servico_final;
 
   // preencher tabela por patente
   const tbody_rt = document.getElementById('resumo-por-posto');
@@ -409,19 +408,57 @@ function renderArranchamentoDia() {
   const tbody_rancho = document.getElementById('resumo-por-rancho');
   tbody_rancho.innerHTML = '';
 
+  let total_cafe_ranchos = 0;
+  let total_almoco_ranchos = 0;
+  let total_janta_ranchos = 0;
+  let total_sv_ranchos = 0;
+
   document.getElementById('bt-editar-ranchos').setAttribute('ranchos', JSON.stringify(ranchos));
   ranchos.forEach(r => {
+
+    let tot_rancho_cafe = totais.t_rancho[r.nome].t_c + (totais.t_rancho[r.nome].t_s * 2);
+    let tot_rancho_almoco = totais.t_rancho[r.nome].t_a + totais.t_rancho[r.nome].t_s;
+    let tot_rancho_jantar = totais.t_rancho[r.nome].t_j + totais.t_rancho[r.nome].t_s;
+    let tot_rancho_sv = totais.t_rancho[r.nome].t_s;
+    let total_ativos_rancho = parseInt(total_ativos[r.nome]['total_ativos']);
+
+    if(tot_rancho_cafe > total_ativos_rancho && total_ativos_rancho > 0) tot_rancho_cafe = total_ativos_rancho;
+    if(tot_rancho_almoco > total_ativos_rancho && total_ativos_rancho > 0) tot_rancho_almoco = total_ativos_rancho;
+    if(tot_rancho_jantar > total_ativos_rancho && total_ativos_rancho > 0) tot_rancho_jantar = total_ativos_rancho;
+
+    total_cafe_ranchos += tot_rancho_cafe;
+    total_almoco_ranchos += tot_rancho_almoco;
+    total_janta_ranchos += tot_rancho_jantar;
+    total_sv_ranchos += tot_rancho_sv;
+
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${r.nome}</td>
-      <td>${totais.t_rancho[r.nome].t_c}</td>
-      <td>${totais.t_rancho[r.nome].t_a}</td>
-      <td>${totais.t_rancho[r.nome].t_j}</td>
-      <td>${totais.t_rancho[r.nome].t_s}</td>
+      <td>${tot_rancho_cafe}</td>
+      <td>${tot_rancho_almoco}</td>
+      <td>${tot_rancho_jantar}</td>
+      <td style="background-color: #EEE; font-style: italic;">(${tot_rancho_sv})</td>
     `;
     tbody_rancho.appendChild(tr);
   });
-  t_servico_final
+
+  //tabela totais
+  /*let t_cafe_final = totais['t_c'] + (totais['t_s'] * 2);
+  let t_almoco_final = totais['t_a'] + totais['t_s'];
+  let t_janta_final = totais['t_j'] + totais['t_s'];
+  let t_servico_final = totais['t_s'];
+  let t_ativos = parseInt(total_ativos['total_geral']['total_ativos']);
+
+  // preencher totais gerais
+  document.getElementById('total-cafe').textContent = t_cafe_final > t_ativos ? t_ativos : t_cafe_final;
+  document.getElementById('total-almoco').textContent = t_almoco_final > t_ativos ? t_ativos : t_almoco_final;
+  document.getElementById('total-janta').textContent = t_janta_final > t_ativos ? t_ativos : t_janta_final;
+  document.getElementById('total-servico').textContent = t_servico_final > t_ativos ? t_ativos : t_servico_final;*/
+
+  document.getElementById('total-cafe').textContent = total_cafe_ranchos;
+  document.getElementById('total-almoco').textContent = total_almoco_ranchos;
+  document.getElementById('total-janta').textContent = total_janta_ranchos;
+  document.getElementById('total-servico').textContent = total_sv_ranchos;
 
 }
 
@@ -434,7 +471,7 @@ function carregarArranchamento() {
       console.log('Dados', dados);
       relatorios = dados.relatorios;
       usuarios = dados.usuarios;
-      total_ativos = parseInt(dados.total_ativos);
+      total_ativos = dados.total_ativos;
 
       renderArranchamentoDia();
 
@@ -443,12 +480,6 @@ function carregarArranchamento() {
         document.getElementById('chk-diferencas')?.click();
         exibir_mudancas();
       }
-
-      /*
-      spanNome.textContent = dados.nome;
-      spanPatente.textContent = dados.patente;
-      spanOM.textContent = dados.sigla_om;
-      */
     }
   ).catch(() => alert('Erro ao carregar dados arranchamento'));
 }
