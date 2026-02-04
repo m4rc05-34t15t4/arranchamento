@@ -39,7 +39,17 @@ document.addEventListener('DOMContentLoaded', function() {
   btnCancelar.addEventListener('click', () => { modal.classList.add('hidden'); });
   btnSalvar.addEventListener('click', () => { salvar_ranchos_modal(lista, btnSalvar, modal); });
   modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.add('hidden'); });  
-  
+
+  window.addEventListener('keydown', (e) => {
+    // Verifica se a tecla P foi pressionada junto com o Ctrl (ou Command no Mac)
+    if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+        if (bloqueioImpressaoAtivo) {
+            e.preventDefault();
+           alert('Gere o Arranchamento para imprimir.');
+        }
+    }
+  });
+
 });
 
 const hoje = agora();
@@ -65,6 +75,7 @@ const lista = document.getElementById('lista-ranchos');
 const btnCancelar = document.getElementById('bt-cancelar');
 const btnSalvar = document.getElementById('bt-salvar');
 const exibir_pessoal_nao_arranchado = false;
+let bloqueioImpressaoAtivo = true; 
 
 
 // Funções
@@ -276,6 +287,7 @@ function renderArranchamentoDia() {
   // Atualiza data atual
   let text_titulo = 'Previsão para';
   if(existe_arranchamento){
+    bloqueioImpressaoAtivo = false;
     text_titulo = 'Arranchamento de';
     //dataArranchamento = nova_datahora(relatorios['data_relatorio']);
     const dt_atu = document.getElementById('data-atualizacao');
