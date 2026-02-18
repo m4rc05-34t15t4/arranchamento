@@ -20,9 +20,13 @@
 
     //VAR_DUMP($_SESSION['ARRANCHAMENTO']);
 
-    $senha_plana = '3cgeo'; // <<< TROQUE AQUI PELA SENHA REAL
+    $s = '3cgeo';
+
+    $senha_plana = $s; // <<< TROQUE AQUI PELA SENHA REAL
 
     $hash = password_hash($senha_plana, PASSWORD_DEFAULT);
+
+    echo password_verify($s, $hash);
 
     echo "<pre>";
     echo "Senha original: {$senha_plana}\n\n";
