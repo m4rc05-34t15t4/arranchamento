@@ -35,7 +35,7 @@
               $titulo = "Arranchamento";
               break;
           }
-          echo $link;// if($_SESSION['ARRANCHAMENTO']['administrador']) echo ' | <a href="" class="logout-link"> Config </a>'.$link;
+          if($_SESSION['ARRANCHAMENTO']['administrador']) echo $link; //echo ' | <a href="" class="logout-link"> Config </a>'.$link;
         ?>
       </div>
     </div>
