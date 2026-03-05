@@ -1,0 +1,8 @@
+-- remove todos usuários que tem apenas café no arranchamento
+UPDATE public.relatorios
+SET usuarios_refeicoes = (
+    SELECT jsonb_object_agg(key, value)
+    FROM jsonb_each_text(usuarios_refeicoes)
+    WHERE value <> 'C'
+)
+WHERE id = 108;
