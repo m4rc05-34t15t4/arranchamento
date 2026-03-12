@@ -6,3 +6,12 @@ SET usuarios_refeicoes = (
     WHERE value <> 'C'
 )
 WHERE id = 108;
+
+
+
+UPDATE relatorios
+SET usuarios_refeicoes = (
+    SELECT jsonb_object_agg(key, CASE WHEN value = '"CAJ"' THEN '"C"' ELSE value END)
+    FROM jsonb_each(usuarios_refeicoes)
+)
+where data_relatorio = '2026-03-13'
