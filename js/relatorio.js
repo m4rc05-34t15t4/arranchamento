@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.botao-menu').forEach(btn => {
     btn.addEventListener('click', () => {
       const elData = document.getElementById('data-atual');
-      const dataRef = elData?.dataset.ref; // YYYY-MM-DD
+      const dataRef = elData?.dataset.ref; //YYYY-MM-DD
       if (!dataRef) return;
       const data = new Date(dataRef + 'T00:00:00');
       const delta = btn.id === 'btn-proximo' ? 1 : -1;
@@ -63,7 +63,9 @@ const dia = params.get('dia') || dataAtualStr;
 const exb_mud = params.get('exibir_mudancas') || 's';
 let dataArranchamento = nova_datahora(dia); //agora();
 let relatorios = null;
+let excecaoRelatorio = null;
 let usuarios = null;
+let usuarios_vazio = [];
 let total_ativos = null;
 let existe_arranchamento = null;
 let houve_mudancas_arranchamento = false;
@@ -228,10 +230,24 @@ function gerarSiglaUsuario(usuario, dataObj) {
   const excecaoSemanal = JSON.parse(usuario.excecao_semanal || '[]');
   const padraoSemanal  = JSON.parse(usuario.padrao_semanal  || '{}');
 
-  // 1️⃣ EXCEÇÃO MANUAL (maior prioridade)
+  /*if(usuario.id == '2'){
+    console.log('excecaoManual', excecaoManual);
+    console.log('excecaoDiaria', excecaoDiaria);
+    console.log('excecaoSemanal', excecaoSemanal);
+    console.log('padraoSemanal', padraoSemanal);
+  }*/
+
+  // EXCEÇÃO RELATORIO  (maior prioridade)
+  //if(excecaoRelatorio[usuario.id] != undefined) return normalizarSigla(excecaoRelatorio[usuario.id]);
+  // 1️⃣ EXCEÇÃO MANUAL
   if (excecaoManual[dataISO]) return normalizarSigla(excecaoManual[dataISO]);
   // 2️⃣ EXCEÇÃO DIÁRIA
-  if (excecaoDiaria[dataISO]) return normalizarSigla(excecaoDiaria[dataISO]);
+  if (excecaoDiaria.length > 0) {
+    for (const e of excecaoDiaria) {
+      const sigla = e.configuracao?.[dataISO];
+      if (sigla !== undefined) return normalizarSigla(sigla);
+    }
+  }
   // 3️⃣ EXCEÇÃO SEMANAL
   if(excecaoSemanal.length > 0){
     for (const e of excecaoSemanal) {
@@ -327,6 +343,7 @@ function renderArranchamentoDia() {
   for (let i = 0; i < usuarios.length; i++) {
     const usu = usuarios[i];
     relatorio_previsao_usu = gerarSiglaUsuario(usu, dataArranchamento);
+    if(usu.id == 2) console.log('usu', relatorio_previsao_usu, usu);
     usuario_previsao[usuarios[i]['id']] = relatorio_previsao_usu;
     usuarios[i]['relatorio_previsao'] = relatorio_previsao_usu;
     usuarios[i]['relatorio_previsao_CAJ'] = [ relatorio_previsao_usu?.includes('C'), relatorio_previsao_usu?.includes('A'), relatorio_previsao_usu?.includes('J') ];
@@ -334,7 +351,7 @@ function renderArranchamentoDia() {
   
   // Converte string JSON em objeto
   let usuario_refeicoes = null;
-  if(existe_arranchamento) usuario_refeicoes = JSON.parse(relatorios["usuarios_refeicoes"]);
+  if(existe_arranchamento) usuario_refeicoes = {...JSON.parse(relatorios["usuarios_refeicoes"]), ...excecaoRelatorio};
   else usuario_refeicoes = {...usuario_previsao};
 
   const totais = {
@@ -366,17 +383,21 @@ function renderArranchamentoDia() {
   tbody.innerHTML = '';
 
   //filtrar usuarios que não estaoarranchados
+  let usuarios_vazio = [];
   const usuariosFiltrados = usuarios.filter(u => {
     const refeicao = usuario_refeicoes[u.id] || '';
+    if( !refeicao.includes('C') && !refeicao.includes('A') && !refeicao.includes('J') && !exibir_pessoal_nao_arranchado) usuarios_vazio.push(u);
     return ( refeicao.includes('C') || refeicao.includes('A') || refeicao.includes('J') || exibir_pessoal_nao_arranchado);
   });
   console.log('usuariosFiltrados', usuariosFiltrados);
+  console.log('usuarios_vazio', usuarios_vazio);
   usuarios = usuariosFiltrados; //Exibir apenas com arranchamento
 
   // Percorre usuários em pares (esquerda/direita)
   for (let i = 0; i < usuarios.length; i += 2) {
     const uEsq = usuarios[i];
     const uDir = usuarios[i + 1];
+    if(uEsq['id'] == 2) console.log('uEsq', uEsq);
     const uEsq_r = [uEsq && usuario_refeicoes[uEsq.id]?.includes('C'), uEsq && usuario_refeicoes[uEsq.id]?.includes('A'), uEsq && usuario_refeicoes[uEsq.id]?.includes('J')];
     const uDir_r = [uDir && usuario_refeicoes[uDir.id]?.includes('C'), uDir && usuario_refeicoes[uDir.id]?.includes('A'), uDir && usuario_refeicoes[uDir.id]?.includes('J')];
     
@@ -482,8 +503,16 @@ function carregarArranchamento() {
 
       console.log('Dados', dados);
       relatorios = dados.relatorios;
+      excecaoRelatorio = JSON.parse(relatorios?.excecoes || '{}');
       usuarios = dados.usuarios;
+      usuariosSistema = {...usuarios};
       total_ativos = dados.total_ativos;
+
+      //console.log('relatorios', relatorios);
+      //console.log('usuarios', usuarios);
+      //console.log('total_ativos', total_ativos);
+
+      renderizarUsuarios(usuarios);
 
       renderArranchamentoDia();
 
@@ -498,7 +527,7 @@ function carregarArranchamento() {
 
 function obterUsuariosRefeicoes() {
   const tbody = document.getElementById('tabela-dia-body');
-  const usuariosRefeicoes = {};
+  let usuariosRefeicoes = {};
   let usuarioAtual = null;
   tbody.querySelectorAll('td').forEach(td => {
     // Quando encontrar o nome, muda o usuário atual
@@ -507,6 +536,7 @@ function obterUsuariosRefeicoes() {
       if (usuarioAtual && !usuariosRefeicoes[usuarioAtual]) usuariosRefeicoes[usuarioAtual] = '';
       return;
     }
+    
     // Processa as refeições pelo atributo previsao
     if (td.classList.contains('t_dia_refeicao') && usuarioAtual) {
       const temRefeicao = td.getAttribute('previsao') === 'true';
@@ -516,15 +546,9 @@ function obterUsuariosRefeicoes() {
         if (tipo === 'almoco') usuariosRefeicoes[usuarioAtual] += 'A';
         if (tipo === 'janta')  usuariosRefeicoes[usuarioAtual] += 'J';
       }
-      /*const temRefeicao = td.textContent.includes('✔️');
-      if (temRefeicao) {
-        const tipo = td.getAttribute('tipo_refeicao');
-        if (tipo === 'cafe')   usuariosRefeicoes[usuarioAtual] += 'C';
-        if (tipo === 'almoco') usuariosRefeicoes[usuarioAtual] += 'A';
-        if (tipo === 'janta')  usuariosRefeicoes[usuarioAtual] += 'J';
-      }*/
     }
   });
+  usuariosRefeicoes = { ...usuariosRefeicoes, ...excecaoRelatorio };
   return usuariosRefeicoes;
 }
 
@@ -542,6 +566,7 @@ function executarSalvarArranchamento(btn) {
     data_relatorio: formatarDataISO_BR(dataArranchamento),
     id_om: $om_id,
     id_responsavel: $responsavel_id,
+    excecoes: excecaoRelatorio,
     usuarios_refeicoes
   };
 

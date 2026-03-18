@@ -48,6 +48,7 @@
           <h5 id="data-atualizacao"></h5>
         </div>
         <div class="acoes-arranchamento">
+          <button id="btnEditarRelatorio" class="btn-editar apagado" title="Adicionar Exceção" onclick="abrirDialogAdm()"> ✏️ </button>
           <button id="btnBloquearDia" class="btn-cadeado aberto" title="Dia aberto">🔓</button>
           <button id="btnExcluirRelatorio" class="btn-lixeira apagado" title="Apagar relatório"> 🗑️ </button>
           <div id="checkbox-exibir-mudancas" class="toggle-switch">
@@ -192,8 +193,10 @@
 
 </main>
 
+<?php include 'dialog_usuarios.php'; ?>
+
 <?php include 'footer.php'; ?>
 
-<script src="../js/relatorio.js?t=<?= $ts ?>"></script>
+<script src="../js/relatorio.js?t=<?=$ts?>"></script>
 </body>
 </html>

@@ -555,7 +555,7 @@ border-left: 5px solid #1e88e5;
   display: none;
 }
 
-.btn-cadeado, .btn-lixeira {
+.btn-cadeado, .btn-lixeira, .btn-editar {
   background: none;
   border: none;
   cursor: pointer;
@@ -564,7 +564,7 @@ border-left: 5px solid #1e88e5;
   transition: transform 0.2s, opacity 0.2s;
 }
 
-.btn-cadeado.aberto, .btn-lixeira.apagado {
+.btn-cadeado.aberto, .btn-lixeira.apagado, .btn-editar.apagado {
   opacity: 0.3;
   color: #666;
 }
@@ -574,11 +574,11 @@ border-left: 5px solid #1e88e5;
   color: #d9534f; /* vermelho */
 }
 
-.btn-cadeado:hover, .btn-lixeira:hover {
+.btn-cadeado:hover, .btn-lixeira:hover, .btn-editar:hover {
   transform: scale(1.15);
 }
 
-.btn-lixeira:hover {
+.btn-lixeira:hover, .btn-editar:hover {
   opacity: 1;
 }
 
@@ -834,6 +834,21 @@ border-left: 5px solid #1e88e5;
   flex-direction: column;
   align-items: center;   /* centraliza horizontalmente */
   justify-content: center;
+}
+
+#tabelaAdm thead th {
+    position: sticky;
+    top: 0;           /* Fixa no topo da div pai */
+    background-color: #555; /* Evita que o conteúdo de baixo apareça através do texto */
+    color: white;
+    z-index: 10;      /* Garante que fique sobre as linhas */
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1); /* Opcional: uma linha sutil para separar */
+}
+
+/* Garante que a tabela ocupe a largura total */
+#tabelaAdm {
+    width: 100%;
+    border-collapse: collapse;
 }
 
 @keyframes fadeBorder {

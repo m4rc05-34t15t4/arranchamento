@@ -15,6 +15,7 @@
     $idOm               = $input['id_om'] ?? null;
     $idResponsavel      = $input['id_responsavel'] ?? null;
     $usuariosRefeicoes  = $input['usuarios_refeicoes'] ?? null;
+    $excecoes           = $input['excecoes'] ?? null;
     $acao               = $input['acao'] ?? null;
 
     if (!$dataRelatorio || !$idOm || !$idResponsavel || !$acao) {
@@ -27,6 +28,9 @@
     if($usuariosRefeicoes)  $usuariosRefeicoesJson = json_encode($usuariosRefeicoes);
     else $usuariosRefeicoesJson = json_encode((object)$usuariosRefeicoes);
 
+    if($excecoes)  $excecoesJson = json_encode($excecoes);
+    else $excecoesJson = json_encode((object)$excecoes);
+
     /* =========================
     DEFINE SQL POR AÇÃO
     ========================= */
@@ -37,11 +41,13 @@
                 data_relatorio,
                 id_om,
                 usuarios_refeicoes,
+                excecoes,
                 id_responsavel
             ) VALUES (
                 '$dataRelatorio',
                 $idOm,
                 '$usuariosRefeicoesJson'::jsonb,
+                '$excecoesJson'::jsonb,
                 $idResponsavel
             )
             RETURNING id;
@@ -52,6 +58,7 @@
             UPDATE relatorios SET
                 usuarios_refeicoes = '$usuariosRefeicoesJson'::jsonb,
                 id_responsavel     = $idResponsavel,
+                excecoes           = '$excecoesJson'::jsonb,
                 data_atualizacao   = CURRENT_TIMESTAMP
             WHERE data_relatorio = '$dataRelatorio'
             AND id_om = $idOm
