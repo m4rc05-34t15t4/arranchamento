@@ -343,7 +343,7 @@ function renderArranchamentoDia() {
   for (let i = 0; i < usuarios.length; i++) {
     const usu = usuarios[i];
     relatorio_previsao_usu = gerarSiglaUsuario(usu, dataArranchamento);
-    if(usu.id == 2) console.log('usu', relatorio_previsao_usu, usu);
+    //if(usu.id == 2) console.log('usu', relatorio_previsao_usu, usu);
     usuario_previsao[usuarios[i]['id']] = relatorio_previsao_usu;
     usuarios[i]['relatorio_previsao'] = relatorio_previsao_usu;
     usuarios[i]['relatorio_previsao_CAJ'] = [ relatorio_previsao_usu?.includes('C'), relatorio_previsao_usu?.includes('A'), relatorio_previsao_usu?.includes('J') ];
@@ -392,12 +392,15 @@ function renderArranchamentoDia() {
   console.log('usuariosFiltrados', usuariosFiltrados);
   console.log('usuarios_vazio', usuarios_vazio);
   usuarios = usuariosFiltrados; //Exibir apenas com arranchamento
-
+  const lista_completa = [...usuariosFiltrados, ...usuarios_vazio];
+  //console.log('Lista Unida:', lista_completa.length, usuariosFiltrados.length, usuarios_vazio.length);
+  usuarios = lista_completa;
+  const qtd_n_vazio = usuariosFiltrados.length;
   // Percorre usuários em pares (esquerda/direita)
   for (let i = 0; i < usuarios.length; i += 2) {
     const uEsq = usuarios[i];
     const uDir = usuarios[i + 1];
-    if(uEsq['id'] == 2) console.log('uEsq', uEsq);
+    //if(uEsq['id'] == 2) console.log('uEsq', uEsq);
     const uEsq_r = [uEsq && usuario_refeicoes[uEsq.id]?.includes('C'), uEsq && usuario_refeicoes[uEsq.id]?.includes('A'), uEsq && usuario_refeicoes[uEsq.id]?.includes('J')];
     const uDir_r = [uDir && usuario_refeicoes[uDir.id]?.includes('C'), uDir && usuario_refeicoes[uDir.id]?.includes('A'), uDir && usuario_refeicoes[uDir.id]?.includes('J')];
     
@@ -408,6 +411,7 @@ function renderArranchamentoDia() {
     processaUsuario(uDir, usuario_refeicoes, totais, mapaPatenteRancho);
     
     const tr = document.createElement('tr');
+    if(!exibir_pessoal_nao_arranchado && i >= qtd_n_vazio) tr.className = 'tr_vazia';
     tr.innerHTML = `${texto_table_dupla(uEsq, uEsq_r, existe_arranchamento)}<td></td>${texto_table_dupla(uDir, uDir_r, existe_arranchamento)}`;
     tbody.appendChild(tr);
   }
@@ -503,7 +507,7 @@ function carregarArranchamento() {
 
       console.log('Dados', dados);
       relatorios = dados.relatorios;
-      $PATENTES = dados.patentes;
+      PATENTES = dados.patentes;
       excecaoRelatorio = JSON.parse(relatorios?.excecoes || '{}');
       usuarios = dados.usuarios;
       usuariosSistema = {...usuarios};

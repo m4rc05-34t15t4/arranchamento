@@ -938,6 +938,10 @@ input:checked + .slider_atv:before { transform: translateX(14px); }
   border-right: none;
 }
 
+tr.tr_vazia {
+  display: none !important;
+}
+
 @keyframes fadeBorder {
   0% {
     outline-color: rgba(255, 152, 0, 0);
