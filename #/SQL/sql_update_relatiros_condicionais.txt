@@ -15,3 +15,15 @@ SET usuarios_refeicoes = (
     FROM jsonb_each(usuarios_refeicoes)
 )
 where data_relatorio = '2026-03-13'
+
+
+
+update usuarios set padrao_semanal = '{
+  "Sexta": "C",
+  "Quarta": "CA",
+  "Quinta": "CA",
+  "Terça": "CA",
+  "Domingo": "",
+  "Segunda": "CA",
+  "Sábado": ""
+}' where id > 401 and id_om = 1 and id_patente = 1

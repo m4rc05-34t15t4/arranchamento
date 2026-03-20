@@ -682,13 +682,8 @@ function limparDialog() {
   document.getElementById('obsExcecao').value = '';
   document.getElementById('dataInicio').value = '';
   document.getElementById('dataFim').value = '';
-
   document.querySelector('input[value="semanal"]').checked = true;
-
-  document
-    .querySelectorAll('#dialogExcecao input[type=checkbox]')
-    .forEach(cb => cb.checked = false);
-
+  document.querySelectorAll('#dialogExcecao input[type=checkbox]').forEach(cb => cb.checked = false);
   toggleModoExcecao();
 }
 
@@ -698,18 +693,14 @@ function carregarUsuario() {
   fetch(`../api/get_usuario.php?id=${$responsavel_id}`)
     .then(r => r.json())
     .then(dados => {
-
       console.log('Dados:', dados);
-
       carregarPadraoSemanal(dados.padrao_semanal);
-
+      excecoes["adm"] = dados.excecao_adm;
       excecoes["semanal"] = Array.isArray(dados.excecao_semanal) ? dados.excecao_semanal : [];
       excecoes["diaria"] = Array.isArray(dados.excecao_diaria) ? dados.excecao_diaria : [];
       excecoes["manual"] = dados.excecao_manual && !Array.isArray(dados.excecao_manual) ? dados.excecao_manual : {};
-      
       arranchamento_relatorios.length = 0;
       if(dados.arranchamentos_relatorios) dados.arranchamentos_relatorios.forEach(e => arranchamento_relatorios.push(e));
-         
       renderExcecoes();
       renderSimulacao();
     })
@@ -902,10 +893,12 @@ function renderSimulacao(data_ref="") {
     let temIndividual = false;
     let temManual = false;
     let temRelatorio = false;
+    let temAdm = false;
 
     /* ================================
        🔒 PRIORIDADE 1 — RELATÓRIO
     ================================= */
+    if(excecoes["adm"][dataISO] != undefined) temAdm = true;
     const relatorio = getRelatorioDia(dataISO);
     if (relatorio) {
       base = refeicoesFromString(relatorio.usuarios_refeicoes);
@@ -977,7 +970,7 @@ function renderSimulacao(data_ref="") {
     tr.innerHTML = `
       <td>
         ${dataISO} ${diaSemana}
-        ${temRelatorio ? '<span class="lock">🔒</span>' : ''}
+        ${temRelatorio ? `<span class="lock">🔒 ${temAdm ? '✏️' : ''}</span>` : `${temAdm ? '<span class="lock">✏️</span>' : ''}`}
       </td>
       <td class="refeicao">${base.cafe ? '✔️' : '-'}</td>
       <td class="refeicao">${base.almoco ? '✔️' : '-'}</td>

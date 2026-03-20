@@ -192,11 +192,9 @@
   </div>
 
 </main>
-
+<script src="../js/funcoes.js?t=<?= $ts ?>"></script>
 <?php include 'dialog_usuarios.php'; ?>
-
 <?php include 'footer.php'; ?>
-
 <script src="../js/relatorio.js?t=<?=$ts?>"></script>
 </body>
 </html>

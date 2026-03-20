@@ -12,12 +12,17 @@
     <table id="tabelaAdm">
       <thead>
         <tr>
-          <th onclick="ordenarUsuarios('patente')">P/G ↕</th>
-          <th onclick="ordenarUsuarios('nome_guerra')">Nome de Guerra ↕</th>
-          <th>Não arranchar</th>
-          <th>Café</th>
-          <th>Almoço</th>
-          <th>Janta</th>
+            <th>P/G</th>
+            <th>Nome de Guerra</th>
+            <th>
+                <label class="switch-header">
+                    <input type="checkbox" id="master-nao" onclick="toggleColuna('chk-nao', this.checked)">
+                    <span class="slider"></span>
+                </label><br><small>Não Arranchar</small>
+            </th>
+            <th><input type="checkbox" id="master-cafe" onclick="toggleColuna('chk-cafe', this.checked)"><br>Café</th>
+            <th><input type="checkbox" id="master-almoco" onclick="toggleColuna('chk-almoco', this.checked)"><br>Almoço</th>
+            <th><input type="checkbox" id="master-janta" onclick="toggleColuna('chk-janta', this.checked)"><br>Janta</th>
         </tr>
       </thead>
       <tbody id="lista-usuarios-adm">

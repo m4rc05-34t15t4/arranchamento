@@ -21,10 +21,18 @@
         u.excecao_semanal,
         u.excecao_diaria,
         u.excecao_manual,
+        u.idt_mil,
+        u.cpf,
+        u.email,
         p.nome AS patente,
         p.ordem AS ordem_patente, 
         o.nome_om,
-        o.sigla_om
+        o.sigla_om,
+        (SELECT 
+            jsonb_object_agg(r.data_relatorio, r.excecoes->>u.id::text) 
+            FROM relatorios r 
+            WHERE r.excecoes ? u.id::text AND r.id_om = u.id_om 
+        ) AS excecao_adm
     FROM usuarios u
     JOIN patentes p ON p.id = u.id_patente
     JOIN om o ON o.id_om = u.id_om
@@ -71,6 +79,7 @@
         'excecao_semanal' => json_decode($usuario['excecao_semanal'] ?? '[]', true) ?? [],
         'excecao_diaria'  => json_decode($usuario['excecao_diaria'] ?? '[]', true) ?? [],
         'excecao_manual'  => json_decode($usuario['excecao_manual'] ?? '[]', true) ?? [],
+        'excecao_adm'     => json_decode($usuario['excecao_adm'] ?? '[]', true) ?? [],
         'arranchamentos_relatorios' => $registros
     ]);
 ?>

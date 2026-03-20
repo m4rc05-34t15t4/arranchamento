@@ -1,28 +1,12 @@
-function popularFiltroPostos() {
-    const select = document.getElementById('filtroPosto');
-    const listaUsuarios = Object.values(usuariosSistema);
-    const postosUnicos = [...new Set(listaUsuarios.map(u => u.patente))];
-    select.innerHTML = '<option value="">Todos os Postos</option>';
-    postosUnicos.forEach(posto => {
-        if (posto) { // Evita valores vazios
-            const option = document.createElement('option');
-            option.value = posto;
-            option.textContent = posto;
-            select.appendChild(option);
-        }
-    });
-}
-
 // Função para renderizar a lista no modal
 function renderizarUsuarios(lista) {
-    popularFiltroPostos();
-    console.log('l', excecaoRelatorio);
+    popularFiltroPostos(document.getElementById('filtroPosto'), PATENTES);
     const corpo = document.getElementById('lista-usuarios-adm');
     corpo.innerHTML = lista.map(u => `
         <tr data-id="${u.id}">
             <td>${u.patente}</td>
             <td>${u.nome_guerra}</td>
-            <td><input type="checkbox" class="chk-nao" ${excecaoRelatorio[u.id] == '' ? 'checked' : ''}></td>
+            <td><label class="switch-header"><input type="checkbox" class="chk-nao" ${excecaoRelatorio[u.id] == '' ? 'checked' : ''}><span class="slider"></span></label></td>
             <td><input type="checkbox" class="chk-cafe" ${excecaoRelatorio[u.id]?.includes('C') ? 'checked' : ''}></td>
             <td><input type="checkbox" class="chk-almoco" ${excecaoRelatorio[u.id]?.includes('A') ? 'checked' : ''}></td>
             <td><input type="checkbox" class="chk-janta" ${excecaoRelatorio[u.id]?.includes('J') ? 'checked' : ''}></td>
@@ -91,9 +75,26 @@ function salvarExcecaoAdm() {
         }
     });
     excecaoRelatorio = {...atualizacoes};
-    fecharDialogAdm();
+    //fecharDialogAdm();
     salvarArranchamento();
 }
+
+function toggleColuna(classeAlvo, marcado) {
+    // Seleciona apenas as linhas que estão visíveis no momento (filtros aplicados)
+    const linhasVisiveis = document.querySelectorAll(`#lista-usuarios-adm tr:not([style*="display: none"])`);
+
+    linhasVisiveis.forEach(tr => {
+        const checkbox = tr.querySelector(`.${classeAlvo}`);
+        if (checkbox) {
+            checkbox.checked = marcado;
+            
+            // Dispara manualmente o evento 'change' para acionar a lógica de 
+            // desmarcar irmãos que fizemos anteriormente
+            checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    });
+}
+
 
 // Funções de abrir/fechar
 function abrirDialogAdm() { document.getElementById('dialogAdm').showModal(); }

@@ -503,6 +503,7 @@ function carregarArranchamento() {
 
       console.log('Dados', dados);
       relatorios = dados.relatorios;
+      $PATENTES = dados.patentes;
       excecaoRelatorio = JSON.parse(relatorios?.excecoes || '{}');
       usuarios = dados.usuarios;
       usuariosSistema = {...usuarios};

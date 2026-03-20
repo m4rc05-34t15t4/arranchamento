@@ -665,6 +665,55 @@ border-left: 5px solid #1e88e5;
   margin-bottom: 16px;
 }
 
+.link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 8px; /* Bordas bem arredondadas */
+  
+  /* Cores e Borda */
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); /* Gradiente sutil */
+  border: 1px solid #115293;
+  
+  /* Sombras e Transição */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* Efeito Hover (Passar o mouse) */
+.link:hover {
+  background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
+  border-color: #0d47a1;
+  transform: translateY(-2px); /* Elevação suave */
+  box-shadow: 0 7px 14px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.1);
+  opacity: 1;
+}
+
+/* Efeito Active (Ao clicar) */
+/* Estado desabilitado/Página atual */
+.link.active {
+  background: #fafbfc; /* Cinza azulado suave */
+  color: #546e7a !important; /* Texto mais escuro para contraste */
+  cursor: default; /* Remove a mãozinha do mouse */
+  pointer-events: none; /* Desabilita cliques e qualquer hover */
+  box-shadow: none; /* Remove a sombra de flutuação */
+  transform: none; /* Garante que não se mova */
+}
+
+
+/* Opcional: Adicionar uma margem se houver vários botões juntos */
+.link + .link {
+  margin-left: 10px;
+}
+
+
 .logout-link {
   font-size: 1rem;
   color: #e3f2fd;
@@ -849,6 +898,44 @@ border-left: 5px solid #1e88e5;
 #tabelaAdm {
     width: 100%;
     border-collapse: collapse;
+}
+
+.switch-header {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 20px;
+}
+.switch-header input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ccc; transition: .4s; border-radius: 20px;
+}
+.slider:before {
+  position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
+  background-color: white; transition: .4s; border-radius: 50%;
+}
+input:checked + .slider { background-color: #f44336; } /* Vermelho para Não Arranchar */
+input:checked + .slider:before { transform: translateX(14px); }
+
+.slider_atv {
+  position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ccc; transition: .4s; border-radius: 20px;
+}
+.slider_atv:before {
+  position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
+  background-color: white; transition: .4s; border-radius: 50%;
+}
+input:checked + .slider_atv { background-color: #2e7d32; } /* Verde pra ativo */
+input:checked + .slider_atv:before { transform: translateX(14px); }
+
+.td_padrao_semanal span{
+  border-right: 1px solid black;
+  padding: 0 5px 0 5px;
+}
+
+.td_padrao_semanal span:last-child{
+  border-right: none;
 }
 
 @keyframes fadeBorder {
