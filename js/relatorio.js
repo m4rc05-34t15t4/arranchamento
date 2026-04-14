@@ -394,8 +394,10 @@ function renderArranchamentoDia() {
   usuarios = usuariosFiltrados; //Exibir apenas com arranchamento
   const lista_completa = [...usuariosFiltrados, ...usuarios_vazio];
   //console.log('Lista Unida:', lista_completa.length, usuariosFiltrados.length, usuarios_vazio.length);
-  usuarios = lista_completa;
+  const usuariosAtivos = lista_completa.filter(u => u.ativo == "t");
+  usuarios = usuariosAtivos;
   const qtd_n_vazio = usuariosFiltrados.length;
+
   // Percorre usuários em pares (esquerda/direita)
   for (let i = 0; i < usuarios.length; i += 2) {
     const uEsq = usuarios[i];

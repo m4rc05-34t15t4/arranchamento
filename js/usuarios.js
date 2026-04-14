@@ -18,8 +18,8 @@ function ordenar(coluna) {
         // Lógica Especial para Hierarquia Militar
         if (coluna === 'p_g' || coluna === 'patente') {
             // Busca o objeto da patente no array global PATENTES pelo NOME que está no usuário
-            const pA = PATENTES.find(p => p.nome === (a.p_g || a.patente));
-            const pB = PATENTES.find(p => p.nome === (b.p_g || b.patente));
+            const pA = PATENTES.find(p => p.nome === (a.patente));
+            const pB = PATENTES.find(p => p.nome === (b.patente));
 
             // Usa o atributo 'ordem' para comparar. Se não achar, usa um valor alto (99)
             valA = pA ? parseInt(pA.ordem) : 99;
